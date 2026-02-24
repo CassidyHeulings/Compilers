@@ -1,0 +1,29 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "C/C++: clang++ build active file",
+            "command": "clang++",
+            "args": [
+                "-fcolor-diagnostics",
+                "-fansi-escape-codes",
+                "-g",
+                "Source/*.cpp",
+                "-o",
+                "Compiler"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/Compiler"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Build all files in source using wildcard."
+        }
+    ],
+    "version": "2.0.0"
+}
