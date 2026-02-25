@@ -4,13 +4,15 @@
 #include <cctype>
 using namespace std;
 // headers
+#include "../Headers/ErrorHandler.hpp"
 #include "../Headers/Logger.hpp"
 #include "../Headers/Lexer.hpp"
 
 int main() {
 	/* === CONSTRUCT CLASS INSTANCES === */
-	Logger logger(true);
-	Lexer lexer;
+	ErrorHandler errorHandler;
+	Logger logger(errorHandler, true);
+	Lexer lexer(logger, "Lexer");
 	std::string currStage; // current part of the compiler we are on for logging
 
 	/* === COLLECT INPUT === */
@@ -33,8 +35,8 @@ int main() {
 	// get the character length of input
 	int progamLength = programs.length();
 	// log input information
-	logger.debug(currStage, "Input: " + programs);
-	logger.debug(currStage, "input length: " + to_string(progamLength));
+	//logger.debug(currStage, "Input: " + programs);
+	//logger.debug(currStage, "input length: " + to_string(progamLength));
 	// close file stream
 	inputFile.close();
 	logger.debug(currStage, "Input Finished Reading");
@@ -79,10 +81,9 @@ int main() {
 			tokenName = lexer.getToken();
 			// get the value of the token
 			tokenVal = lexer.getTokenValue();
-			// log the token
+			// log the token and location
 			logger.debug(currStage, tokenName + " [" + tokenVal + "] found at [" + to_string(lineCount) + ":" + to_string(charCount - tokenVal.length()) + "]");
 			// store the token
-			// log the token and location
 			lexer.clearBuffer(); // clear buffer for next token
 			lexer.resetState(); // reset the state for the next token
 		}

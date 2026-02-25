@@ -1,6 +1,7 @@
 #include "../Headers/Lexer.hpp"
 
-Lexer::Lexer() {
+Lexer::Lexer(Logger& loggerInstance, const std::string& processName) : logger(loggerInstance) {
+    name = processName;
     buffer = ""; // set buffer to empty
     currState = 1; // start at first state
 }

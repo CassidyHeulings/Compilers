@@ -1,9 +1,10 @@
 #include <string>
+#include "Logger.hpp"
 
 // class to hold lexer information and functions
 class Lexer {
 public:
-    Lexer();
+    Lexer(Logger& loggerInstance, const std::string& processName);
     // clear the buffer
     void clearBuffer();
     // reset current and previous state to start
@@ -15,6 +16,10 @@ public:
     // get the token name
     std::string getToken();
 private:
+    // logger instance
+    Logger& logger;
+    // name of this process for the logger
+    std::string name;
     // find index of char value in column chars
     int findIndex(char charVal);
     // check if the state is an accpeting state
