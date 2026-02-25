@@ -10,6 +10,8 @@ public:
     void resetState();
     // get whether the state is a completed token
     bool isCompleteToken(char currChar);
+    // get the token value
+    std::string getTokenValue();
     // get the token name
     std::string getToken();
 private:
@@ -26,7 +28,7 @@ private:
     // char representing each column in transition table
     const char COLUMN_CHARS[26] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
     // matrix of transition table [state][char]
-    int TRANS_TABLE[38][26] = {  /*  a,  b, c, d,  e,  f,  g, h,  i, j, k,  l, m,  n,  o, p, q,  r,  s,  t,  u, v, w, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, =, +, !, $, {, }, (, ), " , " */
+    int TRANS_TABLE[38][26] = {  /* a,  b, c, d,  e,  f,  g, h,  i, j, k,  l, m,  n,  o, p, q,  r,  s,  t,  u, v, w, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, =, +, !, $, {, }, (, ), " , " */
     /* state 0 : */              {  0,  0, 0, 0,  0,  0,  0, 0,  0, 0, 0,  0, 0,  0,  0, 0, 0,  0,  0,  0,  0, 0, 0, 0, 0, 0 },
     /* state 1 : ID */           {  0, 31, 0, 0,  0, 18,  0, 0,  2, 0, 0,  0, 0,  0,  0, 9, 0,  0, 23, 14,  0, 0, 4, 0, 0, 0 },
     /* state 2 */                {  0,  0, 0, 0,  0,  3,  0, 0,  0, 0, 0,  0, 0, 29,  0, 0, 0,  0,  0,  0,  0, 0, 0, 0, 0, 0 },

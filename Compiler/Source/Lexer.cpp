@@ -64,6 +64,10 @@ bool Lexer::isCompleteToken(char currChar) {
     return isToken;
 }
 
+std::string Lexer::getTokenValue() {
+    return buffer;
+}
+
 std::string Lexer::getToken() {
     // uses the current state we are on
     switch(currState) {
@@ -80,19 +84,13 @@ std::string Lexer::getToken() {
             return "PRINT";
             break;
         case 17:
-            return "TRUE";
-            break;
         case 22:
-            return "FALSE";
+            return "BOOLVAL";
             break;
         case 28:
-            return "STRING";
-            break;
         case 30:
-            return "INT";
-            break;
         case 37:
-            return "BOOLEAN";
+            return "TYPE";
             break;
         default:
             return "ERROR";
