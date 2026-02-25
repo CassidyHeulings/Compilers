@@ -94,7 +94,7 @@ std::string Lexer::getToken() {
         case 23:
         case 29:
         case 31:
-        case 39:
+        case 38:
             return "ID";
             break;
         case 3:
@@ -114,6 +114,9 @@ std::string Lexer::getToken() {
         case 30:
         case 37:
             return "TYPE";
+            break;
+        case 39:
+            return "CHARLIST";
             break;
         default:
             return "ERROR";
