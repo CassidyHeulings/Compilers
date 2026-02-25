@@ -27,7 +27,7 @@ int main() {
 	}
 	// read the file
 	while (std::getline(inputFile, line)) {
-		programs += "\n" + line; // keeps track of lines
+		programs += line + "\n"; // keeps track of lines
 	}
 
 	// get the character length of input
@@ -43,14 +43,16 @@ int main() {
 	currStage = "Lexer"; // change the process to lexer
 	int currCharNum = 0; // current character location we are on in input
 	char currChar; // current character we are on
-	int lineCount = 0; // track which line we are on
-	int charCount = 0; // track which character number we are on
+	char nextChar; // next character to look at
+	int lineCount = 1; // track which line we are on
+	int charCount = 1; // track which character number we are on
 	std::string tokenName = ""; // stores the token
 	std::string tokenVal = ""; // stores the value of the token
 
 	// loop through each character in the program
 	while (currCharNum < progamLength) {
 		currChar = programs[currCharNum]; // set the value of the character
+		nextChar = programs[currCharNum + 1]; // set value of the next character
 		charCount++; // increase character count in line
 
 		// ignore white space
@@ -66,21 +68,25 @@ int main() {
 		// debugging
 		std::string debug = "Current character: ";
 		debug += currChar;
+		std::string debug1 = "Next character: ";
+		debug1 += nextChar;
 		logger.debug(currStage, debug);
+		logger.debug(currStage, debug1);
 
 		// if the character completes a token
-		if (lexer.isCompleteToken(currChar)) {
+		if (lexer.isCompleteToken(currChar, nextChar)) {
 			// get the token
 			tokenName = lexer.getToken();
 			// get the value of the token
 			tokenVal = lexer.getTokenValue();
 			// log the token
-			logger.debug(currStage, tokenName + " [" + tokenVal + "] found at [" + to_string(lineCount) + ":" + to_string(charCount - tokenName.length()) + "]");
+			logger.debug(currStage, tokenName + " [" + tokenVal + "] found at [" + to_string(lineCount) + ":" + to_string(charCount - tokenVal.length()) + "]");
 			// store the token
 			// log the token and location
 			lexer.clearBuffer(); // clear buffer for next token
 			lexer.resetState(); // reset the state for the next token
 		}
+
 		// move to next char
 		currCharNum++;
 		logger.debug(currStage, "Character num: " + to_string(currCharNum));

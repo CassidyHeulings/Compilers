@@ -31,7 +31,7 @@ bool Lexer::isAcceptingState(int stateToCheck) {
     int currIndex = 0; // index currently being checked
     bool acceptingState = false; // is the state an accepting state
 
-    // while state is not accepting and current index is within the accpeting state array
+    // while state is not accepting and current index is within the accepting state array
     while (!acceptingState && currIndex <= sizeof(ACCEPTING_STATES)) {
         if (ACCEPTING_STATES[currIndex] == stateToCheck)
             acceptingState = true;
@@ -41,24 +41,39 @@ bool Lexer::isAcceptingState(int stateToCheck) {
     return acceptingState;
 }
 
-bool Lexer::isCompleteToken(char currChar) {
+bool Lexer::isCompleteToken(char currChar, char nextChar) {
     bool isToken = false; // tracks if char completes token
     buffer += currChar; // add character to buffer
+    int currColumnVal = findIndex(currChar); // index of curr char in matrix
+    int nextColumnVal = findIndex(nextChar); // index of next char in matrix
 
-    int columnVal = findIndex(currChar); // get index of character in matrix
-    // check if the value is in the grammar
-    // if (columnVal == -1) return error; 
+    // the next state
+    int nextState;
+    if (currColumnVal == -1) nextState = 0; // error (this is not a token)
+    else nextState = TRANS_TABLE[currState][currColumnVal];
 
-    int nextState = TRANS_TABLE[currState][columnVal]; // get the next state
-    bool acceptingState = isAcceptingState(nextState); // check if current state is accepting
+    // the next state of the next char based on current transition
+    int nextCharNextState;
+    if (nextColumnVal == -1) nextCharNextState = 0; // error (make different error as this is not in the table)
+    else nextCharNextState = TRANS_TABLE[nextState][nextColumnVal];
+
+    bool acceptingState = isAcceptingState(nextState); // check if next state is accepting
+
+    // end of token
+    if (nextCharNextState == 0) {
+        // valid token
+        if (acceptingState)
+            isToken = true;
+        // else raise a flag
+    }
 
     // if the next state is an accepting state
-    if (acceptingState) {
-        isToken = true; // we have a complete token
+    //if (acceptingState) {
+    //    if (nextCharNextState == 0) // end of the token
+    //        isToken = true; // we have a complete token
         // else we have an error
-    } 
-    // set the current state as the next state
-    currState = nextState;
+    //} 
+    currState = nextState; // set the current state as the next state
 
     // only returns true if a completed token
     return isToken;
@@ -71,7 +86,15 @@ std::string Lexer::getTokenValue() {
 std::string Lexer::getToken() {
     // uses the current state we are on
     switch(currState) {
-        case 1:
+        case 2:
+        case 4:
+        case 9:
+        case 14:
+        case 18:
+        case 23:
+        case 29:
+        case 31:
+        case 39:
             return "ID";
             break;
         case 3:
