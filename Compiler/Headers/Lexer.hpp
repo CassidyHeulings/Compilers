@@ -1,5 +1,6 @@
 #include <string>
 #include "Logger.hpp"
+#pragma once
 
 // class to hold lexer information and functions
 class Lexer {

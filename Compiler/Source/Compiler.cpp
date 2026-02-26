@@ -9,15 +9,19 @@ using namespace std;
 #include "../Headers/Lexer.hpp"
 
 int main() {
-	/* === CONSTRUCT CLASS INSTANCES === */
+	/* ===== CONSTRUCT CLASS INSTANCES ===== */
+	std::string currStage = "Initialization"; // current part of the compiler we are on for logging
 	ErrorHandler errorHandler;
-	Logger logger(errorHandler, true);
+	Logger logger(errorHandler, true, false);
+	logger.info(currStage, "Initializing compiler.");
+	// initialize each part of compiler
 	Lexer lexer(logger, "Lexer");
-	std::string currStage; // current part of the compiler we are on for logging
+	logger.debug(currStage, "Lexer ready");
+	logger.endProcess(currStage);
 
-	/* === COLLECT INPUT === */
+
+	/* ===== COLLECT INPUT ===== */
 	currStage = "Reading Input";
-	logger.info(currStage, "Reading programs.");
 	std::ifstream inputFile("Compiler/Input.txt");
 	std::string line; // singular line in file
 	std::string programs; // string of the input
@@ -27,19 +31,22 @@ int main() {
 		logger.info(currStage, "Error: Input.txt not found.");
 		return 1;
 	}
+	logger.info(currStage, "Start of input reading.");
 	// read the file
 	while (std::getline(inputFile, line)) {
 		programs += line + "\n"; // keeps track of lines
 	}
 
+	logger.debug(currStage, "Creating input information");
 	// get the character length of input
 	int progamLength = programs.length();
 	// log input information
-	//logger.debug(currStage, "Input: " + programs);
-	//logger.debug(currStage, "input length: " + to_string(progamLength));
+	logger.test(currStage, "Input: " + programs);
+	logger.test(currStage, "input length: " + to_string(progamLength));
 	// close file stream
 	inputFile.close();
-	logger.debug(currStage, "Input Finished Reading");
+	logger.endProcess(currStage);
+
 
 	/* === LEXER === */
 	currStage = "Lexer"; // change the process to lexer
@@ -51,6 +58,7 @@ int main() {
 	std::string tokenName = ""; // stores the token
 	std::string tokenVal = ""; // stores the value of the token
 
+	logger.info(currStage, "Starting");
 	// loop through each character in the program
 	while (currCharNum < progamLength) {
 		currChar = programs[currCharNum]; // set the value of the character
@@ -72,8 +80,8 @@ int main() {
 		debug += currChar;
 		std::string debug1 = "Next character: ";
 		debug1 += nextChar;
-		logger.debug(currStage, debug);
-		logger.debug(currStage, debug1);
+		logger.test(currStage, debug);
+		logger.test(currStage, debug1);
 
 		// if the character completes a token
 		if (lexer.isCompleteToken(currChar, nextChar)) {
@@ -90,9 +98,17 @@ int main() {
 
 		// move to next char
 		currCharNum++;
-		logger.debug(currStage, "Character num: " + to_string(currCharNum));
+		logger.test(currStage, "Character num: " + to_string(currCharNum));
+	}
+	// decide if end of program
+	if (logger.endProcess(currStage)) {
+		logger.endProgram(currStage);
+		return 1; 
 	}
 
+	/* ===== NEXT STAGE ===== */
 
+	// print end of program line
+	logger.endProgram("Finished");
 	return 0;
 }

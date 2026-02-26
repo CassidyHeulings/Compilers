@@ -50,30 +50,30 @@ bool Lexer::isCompleteToken(char currChar, char nextChar) {
 
     // the next state
     int nextState;
-    if (currColumnVal == -1) nextState = 0; // error (this is not a token)
+    if (currColumnVal == -1) { // invalid symbol
+        nextState = 0;
+        logger.error(name, 0, std::string(1, currChar));
+    }
     else nextState = TRANS_TABLE[currState][currColumnVal];
 
     // the next state of the next char based on current transition
     int nextCharNextState;
-    if (nextColumnVal == -1) nextCharNextState = 0; // error (make different error as this is not in the table)
+    if (nextColumnVal == -1) nextCharNextState = 0; // invalid symbol 
     else nextCharNextState = TRANS_TABLE[nextState][nextColumnVal];
 
     bool acceptingState = isAcceptingState(nextState); // check if next state is accepting
 
     // end of token
     if (nextCharNextState == 0) {
-        // valid token
-        if (acceptingState)
-            isToken = true;
-        // else raise a flag
+        // invalid token
+        if (!acceptingState) {
+            // log the error and the invalid token
+            logger.error(name, 1, buffer);
+        }
+        // completed the token
+        isToken = true;
     }
 
-    // if the next state is an accepting state
-    //if (acceptingState) {
-    //    if (nextCharNextState == 0) // end of the token
-    //        isToken = true; // we have a complete token
-        // else we have an error
-    //} 
     currState = nextState; // set the current state as the next state
 
     // only returns true if a completed token

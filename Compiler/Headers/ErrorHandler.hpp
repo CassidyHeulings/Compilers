@@ -1,13 +1,29 @@
 #include <string>
+#pragma once
 
 // returns error codes to logger
 class ErrorHandler {
 public:
     ErrorHandler();
+    // return the error message based on the code, increase error count
     std::string getErrorMessage(int errorCode);
+    // return the warning message based on the code, increase warning count
+    std::string getWarningMessage(int warningCode);
+    // get the number of errors in the current process
+    int getNumErrors();
+    // get number of warnings in entire program
+    int getNumWarnings();
 private:
-    std::string flags[2] = {
-        "Character not used in grammar", // error code 0
+    // number of errors in the current process
+    int errorCounter;
+    // number of warnings in the program
+    int warningCounter;
+    // possible errors
+    std::string eflags[2] = {
+        "Invalid symbol in grammar", // error code 0
         "Not a valid token" // error code 1
+    };
+    std::string wflags[0] = {
+        // error code 0
     };
 };
