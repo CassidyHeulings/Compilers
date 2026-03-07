@@ -114,13 +114,58 @@ std::string Lexer::getToken() {
         case 37:
             return "TYPE";
             break;
+        case 5:
+        case 6:
+        case 7:
+        case 10:
+        case 11:
+        case 12:
+        case 15:
+        case 16:
+        case 19:
+        case 20:
+        case 21:
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+        case 32:
+        case 33:
         case 34:
+        case 35:
+        case 36:
         case 39:
             return "CHARLIST";
             break;
         case 40:
             return "DIGIT";
             break;
+        case 41:
+            return "ASSIGN";
+            break;
+        case 43:
+            return "BOOLOP";
+            break;
+        case 44:
+            return "INTOP";
+            break;
+        case 45:
+            return "LBRACE";
+            break;
+        case 46:
+            return "RBRACE";
+            break;
+        case 47:
+            return "LPAREN";
+            break;
+        case 48:
+            return "RPAREN";
+            break;
+        case 49:
+            return "QUOTMARK";
+            break;
+        case 50:
+            return "EOP";
         default:
             return "ERROR";
             break;

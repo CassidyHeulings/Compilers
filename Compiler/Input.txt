@@ -1,1 +1,5 @@
-bool w124537
+{()
+print=whileif"intstring"
+intstringbooleanfalse
+true
+==!=+ a 0123456789}$
