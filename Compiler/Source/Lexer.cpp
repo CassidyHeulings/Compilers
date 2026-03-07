@@ -66,12 +66,10 @@ bool Lexer::isCompleteToken(char currChar, char nextChar) {
     // end of token
     if (nextCharNextState == 0) {
         // invalid token
-        if (!acceptingState) {
-            // log the error and the invalid token
-            logger.error(name, 1, buffer);
+        if (acceptingState) {
+            // completed the token
+            isToken = true;
         }
-        // completed the token
-        isToken = true;
     }
 
     currState = nextState; // set the current state as the next state
@@ -116,8 +114,12 @@ std::string Lexer::getToken() {
         case 37:
             return "TYPE";
             break;
+        case 34:
         case 39:
             return "CHARLIST";
+            break;
+        case 40:
+            return "DIGIT";
             break;
         default:
             return "ERROR";
