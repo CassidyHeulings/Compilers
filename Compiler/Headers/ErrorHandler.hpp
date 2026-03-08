@@ -21,7 +21,7 @@ private:
     // possible errors
     std::string eflags[2] = {
         "Invalid symbol in grammar", // error code 0
-        "Not a valid token" // error code 1
+        "Invalid token" // error code 1
     };
     std::string wflags[0] = {
         // error code 0

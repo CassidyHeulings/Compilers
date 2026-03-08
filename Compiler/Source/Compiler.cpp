@@ -13,15 +13,17 @@ int main() {
 	std::string currStage = "Initialization"; // current part of the compiler we are on for logging
 	ErrorHandler errorHandler;
 	Logger logger(errorHandler, true, false);
+	logger.startProcess(currStage);
 	logger.info(currStage, "Initializing compiler.");
 	// initialize each part of compiler
 	Lexer lexer(logger, "Lexer");
-	logger.debug(currStage, "Lexer ready");
+	logger.debug(currStage, "Lexer is ready.");
 	logger.endProcess(currStage);
 
 
 	/* ===== COLLECT INPUT ===== */
 	currStage = "Reading Input";
+	logger.startProcess(currStage);
 	std::ifstream inputFile("Compiler/Input.txt");
 	std::string line; // singular line in file
 	std::string programs; // string of the input
@@ -37,7 +39,7 @@ int main() {
 		programs += line + "\n"; // keeps track of lines
 	}
 
-	logger.debug(currStage, "Creating input information");
+	logger.debug(currStage, "Creating input information.");
 	// get the character length of input
 	int progamLength = programs.length();
 	// log input information
@@ -50,6 +52,7 @@ int main() {
 
 	/* === LEXER === */
 	currStage = "Lexer"; // change the process to lexer
+	logger.startProcess(currStage);
 	int currCharNum = 0; // current character location we are on in input
 	char currChar; // current character we are on
 	char nextChar; // next character to look at
@@ -58,7 +61,7 @@ int main() {
 	std::string tokenName = ""; // stores the token
 	std::string tokenVal = ""; // stores the value of the token
 
-	logger.info(currStage, "Starting");
+	logger.info(currStage, "Starting lexing.");
 	// loop through each character in the program
 	while (currCharNum < progamLength) {
 		currChar = programs[currCharNum]; // set the value of the character
@@ -90,7 +93,7 @@ int main() {
 			// get the value of the token
 			tokenVal = lexer.getTokenValue();
 			// log the token and location
-			logger.debug(currStage, tokenName + " [" + tokenVal + "] found at [" + to_string(lineCount) + ":" + to_string(charCount - tokenVal.length()) + "]");
+			logger.debug(currStage, "\033[36m" + tokenName + "\033[0m [ " + tokenVal + " ] found at [" + to_string(lineCount) + ":" + to_string(charCount - tokenVal.length()) + "]");
 			// store the token
 			lexer.clearBuffer(); // clear buffer for next token
 			lexer.resetState(); // reset the state for the next token
@@ -109,6 +112,6 @@ int main() {
 	/* ===== NEXT STAGE ===== */
 
 	// print end of program line
-	logger.endProgram("Finished");
+	logger.endProgram("Program");
 	return 0;
 }

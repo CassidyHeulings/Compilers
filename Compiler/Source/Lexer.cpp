@@ -167,7 +167,8 @@ std::string Lexer::getToken() {
         case 50:
             return "EOP";
         default:
-            return "ERROR";
+            logger.error(name, 1, buffer);
+            return "\033[31mERROR\033[0m";
             break;
     }
 }
