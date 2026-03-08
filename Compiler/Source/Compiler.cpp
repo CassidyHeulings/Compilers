@@ -87,7 +87,7 @@ int main() {
 		// check if starting a comment
 		if (currChar == '/' && nextChar == '*') {
 			isComment = true;
-			commentStart = "[" + to_string(lineCount) + ":" + to_string(charCount) + "]";
+			commentStart = "[" + to_string(lineCount) + ":" + to_string(charCount - 1) + "]"; // - 1 for length of comment syntax
 		}
 
 		// ignore comments
@@ -122,7 +122,7 @@ int main() {
 			// store the location of the token
 			tokenLocs.push_back("[" + to_string(lineCount) + ":" + to_string(charCount) + "]");
 			// log the token and location
-			//logger.debug(currStage, "\033[36m" + tokenName + "\033[0m [ " + tokenVal + " ] found at [" + to_string(lineCount) + ":" + to_string(charCount - tokenVal.length()) + "]");
+			logger.debug(currStage, "\033[36m" + tokenName + "\033[0m [ " + tokenVal + " ] found at [" + to_string(lineCount) + ":" + to_string(charCount - tokenVal.length()) + "]");
 			// store the token
 			lexer.clearBuffer(); // clear buffer for next token
 			lexer.resetState(); // reset the state for the next token
@@ -138,9 +138,17 @@ int main() {
 		logger.warning(currStage, 0, "Comment started at " + commentStart + " -> Close comment using */");
 	}
 
-	// send a warning if there was never an EOP symbol
-	if (tokenVals.at(tokenVals.size() - 1) != "$") {
-		logger.warning(currStage, 1, "End programs with EOP symbol $");
+	// check if there is any tokens at all
+	if (tokens.size() > 0) {
+		// TODO move this to next stage as error
+		// send a warning if there was no EOP symbol
+		if (tokenVals.at(tokenVals.size() - 1) != "$") {
+			logger.warning(currStage, 1, "End each program with EOP symbol $");
+		}
+	}
+	else {
+		// send a warning if empty code
+		logger.warning(currStage, 2, "Add code to Input.txt file, ensure it is not commented out with /* */");
 	}
 
 	// decide if end of program
