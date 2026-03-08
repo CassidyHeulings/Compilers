@@ -65,6 +65,7 @@ int main() {
 	std::string commentStart = ""; // location of comment start, used for comment close warning
 	std::vector<std::string> tokens; // stores the tokens
 	std::vector<std::string> tokenVals; // stores the token values 
+	std::vector<std::string> tokenLocs; // stores the locations of tokens in input
 
 	logger.info(currStage, "Starting lexing.");
 	// loop through each character in the program
@@ -118,8 +119,10 @@ int main() {
 			// get the value of the token
 			tokenVal = lexer.getTokenValue();
 			tokenVals.push_back(tokenVal);
+			// store the location of the token
+			tokenLocs.push_back("[" + to_string(lineCount) + ":" + to_string(charCount) + "]");
 			// log the token and location
-			logger.debug(currStage, "\033[36m" + tokenName + "\033[0m [ " + tokenVal + " ] found at [" + to_string(lineCount) + ":" + to_string(charCount - tokenVal.length()) + "]");
+			//logger.debug(currStage, "\033[36m" + tokenName + "\033[0m [ " + tokenVal + " ] found at [" + to_string(lineCount) + ":" + to_string(charCount - tokenVal.length()) + "]");
 			// store the token
 			lexer.clearBuffer(); // clear buffer for next token
 			lexer.resetState(); // reset the state for the next token
@@ -129,7 +132,7 @@ int main() {
 		currCharNum++;
 		logger.test(currStage, "Character num: " + to_string(currCharNum));
 	}
-	
+
 	// send a warning if the comment was never finished
 	if (isComment) {
 		logger.warning(currStage, 0, "Comment started at " + commentStart + " -> Close comment using */");
