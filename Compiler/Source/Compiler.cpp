@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <cctype>
+#include <vector>
 using namespace std;
 // headers
 #include "../Headers/ErrorHandler.hpp"
@@ -62,6 +63,8 @@ int main() {
 	std::string tokenVal = ""; // stores the value of the token
 	bool isComment = false; // true when we are looking in a comment
 	std::string commentStart = ""; // location of comment start, used for comment close warning
+	std::vector<std::string> tokens; // stores the tokens
+	std::vector<std::string> tokenVals; // stores the token values 
 
 	logger.info(currStage, "Starting lexing.");
 	// loop through each character in the program
@@ -111,8 +114,10 @@ int main() {
 		if (lexer.isCompleteToken(currChar, nextChar)) {
 			// get the token
 			tokenName = lexer.getToken();
+			tokens.push_back(tokenName);
 			// get the value of the token
 			tokenVal = lexer.getTokenValue();
+			tokenVals.push_back(tokenVal);
 			// log the token and location
 			logger.debug(currStage, "\033[36m" + tokenName + "\033[0m [ " + tokenVal + " ] found at [" + to_string(lineCount) + ":" + to_string(charCount - tokenVal.length()) + "]");
 			// store the token
@@ -128,6 +133,11 @@ int main() {
 	// send a warning if the comment was never finished
 	if (isComment) {
 		logger.warning(currStage, 0, "Comment started at " + commentStart + " -> Close comment using */");
+	}
+
+	// send a warning if there was never an EOP symbol
+	if (tokenVals.at(tokenVals.size() - 1) != "$") {
+		logger.warning(currStage, 1, "End programs with EOP symbol $");
 	}
 
 	// decide if end of program

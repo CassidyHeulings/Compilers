@@ -25,9 +25,9 @@ void Logger::error(const std::string& currProcess, int errorCode, const std::str
     std::cout << "\033[31m[ERROR] " << currProcess << " - " << errorMessage << " -> " << errorCause << "\033[0m" << std::endl;
 }
 
-void Logger::warning(const std::string& currProcess, int warningCode, const std::string& warningCause) {
+void Logger::warning(const std::string& currProcess, int warningCode, const std::string& warningFix) {
     std::string warningMessage = errorHandler.getWarningMessage(warningCode);
-    std::cout << "\033[33m[WARNING] " << currProcess << " - " << warningMessage << " -> " << warningCause << "\033[0m" << std::endl;
+    std::cout << "\033[33m[WARNING] " << currProcess << " - " << warningMessage << " -> " << warningFix << "\033[0m" << std::endl;
 }
 
 void Logger::startProcess(const std::string& currProcess) {
