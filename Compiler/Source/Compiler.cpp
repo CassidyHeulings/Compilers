@@ -60,6 +60,8 @@ int main() {
 	int charCount = 1; // track which character number we are on
 	std::string tokenName = ""; // stores the token
 	std::string tokenVal = ""; // stores the value of the token
+	bool isComment = false; // true when we are looking in a comment
+	std::string commentStart = ""; // location of comment start, used for comment close warning
 
 	logger.info(currStage, "Starting lexing.");
 	// loop through each character in the program
@@ -75,7 +77,26 @@ int main() {
 				charCount = 1; // reset character count in line
 			}
 			currCharNum++;
-			continue;
+			continue; // move to next char
+		}
+
+		// check if starting a comment
+		if (currChar == '/' && nextChar == '*') {
+			isComment = true;
+			commentStart = "[" + to_string(lineCount) + ":" + to_string(charCount) + "]";
+		}
+
+		// ignore comments
+		if (isComment) {
+			// end the comment
+			if (currChar == '*' && nextChar == '/') {
+				isComment = false; // no longer in a comment
+				// skip past the next char /
+				currCharNum++;
+				charCount++;
+			}
+			currCharNum++;
+			continue; // move to next char
 		}
 
 		// debugging
@@ -103,6 +124,12 @@ int main() {
 		currCharNum++;
 		logger.test(currStage, "Character num: " + to_string(currCharNum));
 	}
+	
+	// send a warning if the comment was never finished
+	if (isComment) {
+		logger.warning(currStage, 0, "Comment started at " + commentStart + " -> Close comment using */");
+	}
+
 	// decide if end of program
 	if (logger.endProcess(currStage)) {
 		logger.endProgram(currStage);

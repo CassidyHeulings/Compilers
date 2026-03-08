@@ -23,7 +23,7 @@ private:
         "Invalid symbol in grammar", // error code 0
         "Invalid token" // error code 1
     };
-    std::string wflags[0] = {
-        // error code 0
+    std::string wflags[1] = {
+        "Comment never closed" // warning code 0
     };
 };
