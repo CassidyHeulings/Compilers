@@ -35,7 +35,7 @@ void Logger::startProcess(const std::string& currProcess) {
 };
 
 bool Logger::endProcess(const std::string& currProcess) {
-    info(currProcess, " Finished. ");
+    info(currProcess, "Finished. ");
     //std::cout << " ========= " << currProcess << " is Finished =========\n" << std::endl;
     int numErrors = errorHandler.getNumErrors();
     return (numErrors > 0);

@@ -2,6 +2,7 @@
 
 Lexer::Lexer(Logger& loggerInstance, const std::string& processName) : logger(loggerInstance) {
     name = processName;
+    logger.test(name, "hi im the lexer");
     buffer = ""; // set buffer to empty
     currState = 1; // start at first state
 }

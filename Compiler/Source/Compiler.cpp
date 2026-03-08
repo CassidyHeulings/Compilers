@@ -8,17 +8,20 @@ using namespace std;
 #include "../Headers/ErrorHandler.hpp"
 #include "../Headers/Logger.hpp"
 #include "../Headers/Lexer.hpp"
+#include "../Headers/Parser.hpp"
 
 int main() {
 	/* ===== CONSTRUCT CLASS INSTANCES ===== */
 	std::string currStage = "Initialization"; // current part of the compiler we are on for logging
 	ErrorHandler errorHandler;
-	Logger logger(errorHandler, true, false);
+	Logger logger(errorHandler, true, true); // errorHandler instance, debugger on, tester on
 	logger.startProcess(currStage);
 	logger.info(currStage, "Initializing compiler.");
 	// initialize each part of compiler
 	Lexer lexer(logger, "Lexer");
 	logger.debug(currStage, "Lexer is ready.");
+	Parser parser(logger, "Parser");
+	logger.debug(currStage, "Parser is ready.");
 	logger.endProcess(currStage);
 
 
@@ -157,9 +160,22 @@ int main() {
 		return 1; 
 	}
 
-	/* ===== NEXT STAGE ===== */
+	/* ===== PARSER ===== */
+	currStage = "Parser"; // change the process to lexer
+	logger.startProcess(currStage);
 
+	logger.info(currStage, "Starting parser.");
+	// decide if end of program
+	if (logger.endProcess(currStage)) {
+		logger.endProgram(currStage);
+		return 1; 
+	}
+
+	/* ===== NEXT PROCESS ===== */
+
+
+	/* ===== END OF COMPILE ===== */
 	// print end of program line
-	logger.endProgram("Program");
+	logger.endProgram("Compile");
 	return 0;
 }
