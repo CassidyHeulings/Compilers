@@ -176,6 +176,6 @@ int main() {
 
 	/* ===== END OF COMPILE ===== */
 	// print end of program line
-	logger.endProgram("Compile");
+	logger.endProgram("Program");
 	return 0;
 }
