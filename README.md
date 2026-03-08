@@ -2,7 +2,7 @@
 Labs and Projects for Compilers class.
 ## How to build and run
 The following instructions are for running from the Compilers repository.
-Add your code to compile into {file for code to run}
+Add your code to compile into Input.txt
 ### Build (MAC)
 Must be run after every change.
 Build from VSCode Terminal: Shift + Command + B
