@@ -42,16 +42,16 @@ parseValue() {
  addNode(branch,value)  
  if (checkExpected is num) {  
   match(num)  
- }
+ }  
  else {  
   match(lparen)  
   parseExpr()  
   match(rparen)  
   moveUp()  
- }
+ }  
 }  
 parseExpr() {  
- addNode(branch,expr)
+ addNode(branch,expr)  
  if (checkExpected is plus) {  
   match(plus)  
   parseValue()  
@@ -69,9 +69,9 @@ parseValues() {
   parseValue()  
   parseValues()  
  }  
- else {
-  // null 
- }
+ else {  
+  // null  
+ }  
  moveUp()  
 }  
 match(expected) {  
@@ -84,18 +84,18 @@ match(expected) {
 My textbook says 5 -> S S + \ S S * \ a  
 so I am assuming it says S -> S S + | S S * | a  
 (a)  
-<S>  
-<S> <S> *  
-<S> <S> + <S> *  
- a  <S> + <S> *  
- a   a  + <S> *  
+\<S>  
+\<S> \<S> *  
+\<S> \<S> + \<S> *  
+ a  \<S> + \<S> *  
+ a   a  + \<S> *  
  a   a  +  a  *  
 (b)  
-<S>  
-<S> <S> *  
-<S>  a  *  
-<S> <S> +  a  *  
-<S>  a  +  a  *  
+\<S>  
+\<S> \<S> *  
+\<S>  a  *  
+\<S> \<S> +  a  *  
+\<S>  a  +  a  *  
  a   a  +  a  *  
 (c)  
 S  
