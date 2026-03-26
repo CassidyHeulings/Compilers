@@ -1,8 +1,8 @@
 # Lab 3
 ## Crafting a Compiler
-# 4.7
+### 4.7
 (a)  
-<Start>  
+\<Start>  
 <E> $  
 <T> plus <E> $  
 <F> plus <E> $  
@@ -16,7 +16,7 @@ num plus num times num plus <T> $
 num plus num times num plus <F> $  
 num plus num times num plus num $  
 (b)  
-<Start>  
+\<Start>  
 <E> $  
 <T> plus <E> $  
 <T> plus <T> $  
@@ -30,7 +30,7 @@ num plus num times num plus num $
 num times num plus num times num $  
 (c)  
 This grammar makes sure the order of operations is done correctly by putting plus and times in two different rules and adding () whenever we go from F to E in rules 6. Rule 6 allows for any expressions within () to be further down the tree so they are done first (using in order depth first traversal). If we did not have multiplication and addition in seperate rules (E becomes T which then becomes multiplication) then we would have addition and multiplication on the same level in the tree, making which every operation is next in the order go first since there would be no difference in depth. This would also allow addition to be done before multiplication.
-# 5.2
+### 5.2
 (c)   
 parseStart() {  
  addNode(root,start)  
@@ -40,12 +40,15 @@ parseStart() {
 }  
 parseValue() {  
  addNode(branch,value)  
- match(num)  
- or
- match(lparen)  
- parseExpr()  
- match(rparen)  
- moveUp()  
+ if (checkExpected is num) {  
+  match(num)  
+ }
+ else {  
+  match(lparen)  
+  parseExpr()  
+  match(rparen)  
+  moveUp()  
+ }
 }  
 parseExpr() {  
  addNode(branch,expr)
@@ -77,7 +80,7 @@ match(expected) {
  else error  
 }  
 ## Dragon
-# 4.2.1
+## 4.2.1
 My textbook says 5 -> S S + \ S S * \ a  
 so I am assuming it says S -> S S + | S S * | a  
 (a)  
