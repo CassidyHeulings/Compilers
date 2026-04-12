@@ -5,10 +5,10 @@ class ParseTree {
 public:
     // constructor
     ParseTree();
+    // move the current node pointer up the tree by 1 level
+    void moveUpTree();
     // add a child to the tree
-    bool addChild(const std::string& newName);
-    // TODO retrive a pointer to the next child node from the tree
-    //std::unique_ptr<Node> retrieveChildren(const std::string& child);
+    void addChild(const std::string& newName);
     // retrive the pointer to the parent node from the tree
     Node* retrieveParent();
 private:

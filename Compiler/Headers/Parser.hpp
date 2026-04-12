@@ -1,6 +1,6 @@
 #include <string>
 #include "Logger.hpp"
-#include "Node.hpp"
+//#include "Node.hpp"
 #include "ParseTree.hpp"
 #pragma once
 
@@ -17,8 +17,34 @@ private:
     Logger& logger;
     // name of this process for the logger
     std::string name;
-    // store the root of each tree
-    Node allRoots[];
+    // store the location of each tree
+    std::vector<std::unique_ptr<ParseTree>> allTrees;
+    ParseTree* currTree = nullptr;
+    // match function
+    void match(const std::string& expected);
+    // parse functions for each token
+    void parseProgram();
+    void parseBlock();
+    void parseStatementList();
+    void parseStatement();
+    void parsePrintStatement();
+    void parseAssignmentStatement();
+    void parseVarDecl();
+    void parseWhileStatement();
+    void parseIfStatement();
+    void parseExpr();
+    void parseIntExpr();
+    void parseStringExpr();
+    void parseBooleanExpr();
+    void parseId();
+    void parseCharList();
+    bool parseType();
+    bool parseChar();
+    bool parseSpace();
+    bool parseDigit();
+    bool parseBoolop();
+    bool parseBoolval();
+    bool parseIntop();
     // a function to add node
     // a function to move up the tree to parent node
     // a function to match the token

@@ -15,10 +15,14 @@ std::vector<std::unique_ptr<Node>>& Node::getChildren() {
     return children;
 }
 
-std::unique_ptr<Node>& Node::getChild() {
-    return children.front();
+std::unique_ptr<Node>& Node::getLastChild() {
+    return children.back();
 }
 
 Node* Node::getParent() {
     return parent;
+}
+
+const std::string& Node::getName() {
+    return name;
 }

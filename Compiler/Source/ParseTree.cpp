@@ -7,8 +7,14 @@ ParseTree::ParseTree() : root("Root", nullptr), currNode(&root) {
     // this is the node we start on
 }
 
-bool ParseTree::addChild(const std::string& newName) {
+void ParseTree::moveUpTree() {
+    currNode = currNode->getParent();
+}
+
+void ParseTree::addChild(const std::string& newName) {
     currNode->addChild(newName);
+    // set the current node to this new child node
+    currNode = currNode->getLastChild().get();
 }
 
 /* std::unique_ptr<Node> ParseTree::retrieveChildren() {
