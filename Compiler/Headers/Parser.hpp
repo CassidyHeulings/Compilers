@@ -51,12 +51,12 @@ private:
     void parseId();
     void parseCharList();
     void parseType();
-    bool parseChar();
-    bool parseSpace();
-    bool parseDigit();
-    bool parseBoolop();
-    bool parseBoolval();
-    bool parseIntop();
+    void parseChar();
+    void parseSpace();
+    void parseDigit();
+    void parseBoolop();
+    void parseBoolval();
+    void parseIntop();
     // a function to add node
     // a function to move up the tree to parent node
     // a function to match the token

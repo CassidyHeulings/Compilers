@@ -1,4 +1,4 @@
-#include "ParseTree.hpp"
+#include "../Headers/ParseTree.hpp"
 
 ParseTree::ParseTree() : root("Root", nullptr), currNode(&root) {
     // the root node will have a null parent node
@@ -24,7 +24,7 @@ void ParseTree::addChild(const std::string& newName) {
     return children;
 } */
 
-Node* ParseTree::retrieveParent() {
+/* Node* ParseTree::retrieveParent() {
     // get the pointer to the parent of the node we are on
     currNode->getParent();
-}
+} */

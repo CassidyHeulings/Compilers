@@ -242,37 +242,37 @@ void Parser::parseType() {
 }
 
 // TODO check charlist token
-bool Parser::parseChar() {
+void Parser::parseChar() {
     currTree->addChild(tokenVals->at(tokenIndex)); // will make a child for every char rn
     match({"ID"}); // matches token ID because all characters are considered IDs in lex
     currTree->moveUpTree();
 }
 
-bool Parser::parseSpace() {
+void Parser::parseSpace() {
     currTree->addChild(tokenVals->at(tokenIndex));
     match({"SPACE"});
     currTree->moveUpTree();
 }
 
-bool Parser::parseDigit() {
+void Parser::parseDigit() {
     currTree->addChild(tokenVals->at(tokenIndex));
     match({"DIGIT"});
     currTree->moveUpTree();
 }
 
-bool Parser::parseBoolop() {
+void Parser::parseBoolop() {
     currTree->addChild(tokenVals->at(tokenIndex));
     match({"BOOLOP"});
     currTree->moveUpTree();
 }
 
-bool Parser::parseBoolval() {
+void Parser::parseBoolval() {
     currTree->addChild(tokenVals->at(tokenIndex));
     match({"BOOLVAL"});
     currTree->moveUpTree();
 }
 
-bool Parser::parseIntop() {
+void Parser::parseIntop() {
     currTree->addChild(tokenVals->at(tokenIndex));
     match({"INTOP"});
     currTree->moveUpTree();

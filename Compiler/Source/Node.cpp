@@ -1,4 +1,4 @@
-#include "Node.hpp"
+#include "../Headers/Node.hpp"
 
 Node::Node(const std::string& newName, Node* newParent) 
     : name(newName), parent(newParent) {
@@ -7,8 +7,7 @@ Node::Node(const std::string& newName, Node* newParent)
 
 // add a child to the children vector of the node that called the function
 void Node::addChild(const std::string& childName) {
-    std::unique_ptr<Node> newChild = std::make_unique<Node>(childName, this);
-    children.push_back(newChild);
+    children.push_back(std::make_unique<Node>(childName, this));
 }
 
 std::vector<std::unique_ptr<Node>>& Node::getChildren() {

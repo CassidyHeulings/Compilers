@@ -1,5 +1,5 @@
-#pragma once
 #include "Node.hpp"
+#pragma once
 
 class ParseTree {
 public:
@@ -10,7 +10,7 @@ public:
     // add a child to the tree
     void addChild(const std::string& newName);
     // retrive the pointer to the parent node from the tree
-    Node* retrieveParent();
+    //Node* retrieveParent();
 private:
     // root node of the tree
     Node root;
