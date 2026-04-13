@@ -219,16 +219,16 @@ void Parser::parseId() {
     currTree->moveUpTree();
 }
 
-// TODO add space token
 void Parser::parseCharList() {
     currTree->addChild("CharList");
     // all chars are under token ID
-    if (tokens->at(tokenIndex) == "ID") {
+    if (tokens->at(tokenIndex) == "CHAR") {
         parseChar();
         parseCharList();
     }
     else if (tokenVals->at(tokenIndex) == " ") {
         parseSpace();
+        parseCharList();
     }
     else {
         // epsilon production 
@@ -241,10 +241,9 @@ void Parser::parseType() {
     currTree->moveUpTree();
 }
 
-// TODO check charlist token
 void Parser::parseChar() {
     currTree->addChild(tokenVals->at(tokenIndex)); // will make a child for every char rn
-    match({"ID"}); // matches token ID because all characters are considered IDs in lex
+    match({"CHAR"});
     currTree->moveUpTree();
 }
 
