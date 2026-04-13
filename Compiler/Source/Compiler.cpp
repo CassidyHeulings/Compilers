@@ -165,6 +165,11 @@ int main() {
 	logger.startProcess(currStage);
 
 	logger.info(currStage, "Starting parser.");
+
+	// send the lexer values to the parser
+	parser.setValues(tokens, tokenVals);
+	parser.startParse();
+
 	// decide if end of program
 	if (logger.endProcess(currStage)) {
 		logger.endProgram(currStage);

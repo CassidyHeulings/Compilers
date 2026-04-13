@@ -1,6 +1,5 @@
 #include <string>
 #include "Logger.hpp"
-//#include "Node.hpp"
 #include "ParseTree.hpp"
 #pragma once
 
@@ -8,6 +7,10 @@
 class Parser {
 public:
     Parser(Logger& loggerInstance, const std::string& processName);
+    // get pointers to the addresses of the necessary vectors
+    void setValues(std::vector<std::string>& newTokens, std::vector<std::string>& newVals);
+    // check if there is more tokens to parse
+    void checkForNewTree();
     // to start the parse (create a new tree for each parse)
     void startParse();
     // collect the next piece of input using a pointer
@@ -17,11 +20,20 @@ private:
     Logger& logger;
     // name of this process for the logger
     std::string name;
-    // store the location of each tree
+    // store the pointers to each tree
     std::vector<std::unique_ptr<ParseTree>> allTrees;
+    // pointer to current tree
     ParseTree* currTree = nullptr;
-    // match function
-    void match(const std::string& expected);
+    // pointer to tokens produced by lexer
+    std::vector<std::string>* tokens;
+    // pointer to token values from the code
+    std::vector<std::string>* tokenVals;
+    // index of token we are on
+    int tokenIndex = 0;
+    // match the token name function
+    void match(std::vector<std::string> expected);
+    // match the token and token value
+    void matchValue(std::vector<std::string> expectedVal);
     // parse functions for each token
     void parseProgram();
     void parseBlock();
@@ -38,7 +50,7 @@ private:
     void parseBooleanExpr();
     void parseId();
     void parseCharList();
-    bool parseType();
+    void parseType();
     bool parseChar();
     bool parseSpace();
     bool parseDigit();
