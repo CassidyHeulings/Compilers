@@ -6,7 +6,7 @@ public:
     // constructor
     ParseTree();
     // move the current node pointer up the tree by 1 level
-    void moveUpTree();
+    bool moveUpTree();
     // add a child to the tree
     void addChild(const std::string& newName);
     // retrieve location of the root node of the tree

@@ -24,9 +24,10 @@ private:
         "Invalid token", // error code 1
         "Invalid grammar" // error code 2
     };
-    std::string wflags[3] = {
+    std::string wflags[4] = {
         "Comment never closed", // warning code 0
         "Program was not ended properly", // warning code 1
-        "No code inputted" // warning code 2
+        "No code inputted", // warning code 2
+        "Parse tree ends prematurely after first error" // warning code 3
     };
 };

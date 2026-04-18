@@ -173,7 +173,7 @@ int main() {
 
 	// decide if end of program
 	if (logger.endProcess(currStage)) {
-		logger.endProgram(currStage);
+		logger.endProgram();
 		return 1; 
 	}
 
@@ -197,9 +197,11 @@ int main() {
 		progNum++;
 	}
 
-	// decide if end of program
+	// if any errors occured, end the program
 	if (logger.endProcess(currStage)) {
-		logger.endProgram(currStage);
+		// this will only happen if debug is on, as parse errors are caught during process
+		logger.warning(currStage, 3, "Fix first error and try again.");
+		logger.endProgram();
 		return 1; 
 	}
 
@@ -208,6 +210,6 @@ int main() {
 
 	/* ===== END OF COMPILE ===== */
 	// print end of program line
-	logger.endProgram("Program");
+	logger.endProgram();
 	return 0;
 }

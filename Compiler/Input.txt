@@ -1,7 +1,3 @@
 {
-    int a
-    boolean b
-} 
-{
-    print("hi")
-} $
+    print("i   m7")
+}

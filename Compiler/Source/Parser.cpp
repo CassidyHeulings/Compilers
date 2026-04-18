@@ -1,8 +1,6 @@
 #include "../Headers/Parser.hpp"
 #include <iostream>
 
-// TODO remove charlist token
-
 Parser::Parser(Logger& loggerInstance, const std::string& processName) 
     : logger(loggerInstance), tokens(nullptr), tokenVals(nullptr), tokenLocs(nullptr) {
     name = processName;
@@ -54,12 +52,12 @@ void Parser::printTree(Node& nodeLoc, int treeLevel) {
 }
 
 // match the token name
-void Parser::match(std::vector<std::string> expected) {
+void Parser::match(std::string expected) {
     bool isMatch = false;
     int i = 0;
     while (i < expected.size() && !isMatch) {
         // if the token we are on is the expected token or token value
-        if (tokens->at(tokenIndex) == expected[i]) {
+        if (tokens->at(tokenIndex) == expected) {
             currTree->addChild("[ " + tokenVals->at(tokenIndex) + " ]");
             // move to next token
             tokenIndex++;
@@ -71,14 +69,18 @@ void Parser::match(std::vector<std::string> expected) {
         i++;
     }
     if (!isMatch) {
-        std::string possibilities = "";
-        for (std::string option : expected) {
-            possibilities = possibilities + option + ", ";
-        }
         // TODO error handling using logger error
-        logger.error(name, 2, "Expected " + possibilities + "found " + tokens->at(tokenIndex) + " at " + tokenLocs->at(tokenIndex));
-        tokenIndex++;
-        currTree->moveUpTree();
+        logger.error(name, 2, "Expected " + getTokenValues(expected) + " found " + tokenVals->at(tokenIndex) + " at " + tokenLocs->at(tokenIndex));
+        // end the program if debug is not on
+        if (!logger.getDebug()) {
+            logger.endProgram();
+            std::exit(0);
+        }
+        // continue after error
+        else {
+            tokenIndex++;
+            if (currTree->moveUpTree()) currTree->moveUpTree();
+        }
     }
 }
 
@@ -86,15 +88,15 @@ void Parser::parseProgram() {
     logger.test(name, "Parse Program");
     currTree->addChild("< \033[36mProgram\033[0m >");
     parseBlock();
-    match({"EOP"});
+    match("EOP");
     currTree->moveUpTree();
 }
 
 void Parser::parseBlock() {
     currTree->addChild("< \033[36mBlock\033[0m >");
-    match({"LBRACE"});
+    match("LBRACE");
     parseStatementList();
-    match({"RBRACE"});
+    match("RBRACE");
     currTree->moveUpTree();
 }
 
@@ -141,17 +143,17 @@ void Parser::parseStatement() {
 
 void Parser::parsePrintStatement() {
     currTree->addChild("< \033[36mPrintStatement\033[0m >");
-    match({"PRINT"});
-    match({"LPAREN"});
+    match("PRINT");
+    match("LPAREN");
     parseExpr();
-    match({"RPAREN"});
+    match("RPAREN");
     currTree->moveUpTree();
 }
 
 void Parser::parseAssignmentStatement() {
     currTree->addChild("< \033[36mAssignmentStatement\033[0m >");
     parseId();
-    match({"ASSIGN"});
+    match("ASSIGN");
     parseExpr();
     currTree->moveUpTree();
 }
@@ -165,7 +167,7 @@ void Parser::parseVarDecl() {
 
 void Parser::parseWhileStatement() {
     currTree->addChild("< \033[36mWhileStatement\033[0m >");
-    match({"WHILE"});
+    match("WHILE");
     parseBooleanExpr();
     parseBlock();
     currTree->moveUpTree();
@@ -173,7 +175,7 @@ void Parser::parseWhileStatement() {
 
 void Parser::parseIfStatement() {
     currTree->addChild("< \033[36mIfStatement\033[0m >");
-    match({"IF"});
+    match("IF");
     parseBooleanExpr();
     parseBlock();
     currTree->moveUpTree();
@@ -209,25 +211,25 @@ void Parser::parseIntExpr() {
 
 void Parser::parseStringExpr() {
     currTree->addChild("< \033[36mParseStringExpr\033[0m >");
-    match({"QUOTMARK"});
+    match("QUOTMARK");
     parseCharList();
-    match({"QUOTMARK"});
+    match("QUOTMARK");
     currTree->moveUpTree();
 }
 
 void Parser::parseBooleanExpr() {
     currTree->addChild("< \033[36mBooleanExpr\033[0m >");
-    match({"LPAREN"});
+    match("LPAREN");
     parseExpr();
     parseBoolop();
     parseExpr();
-    match({"RPAREN"});
+    match("RPAREN");
     currTree->moveUpTree();
 }
 
 void Parser::parseId() {
     currTree->addChild("< \033[36mId\033[0m >");
-    match({"ID"});
+    match("ID");
     currTree->moveUpTree();
 }
 
@@ -250,42 +252,62 @@ void Parser::parseCharList() {
 
 void Parser::parseType() {
     currTree->addChild("< \033[36mType\033[0m >");
-    match({"TYPE"});
+    match("TYPE");
     currTree->moveUpTree();
 }
 
 void Parser::parseChar() {
     currTree->addChild("< \033[36mChar\033[0m >");
-    match({"CHAR"});
+    match("CHAR");
     currTree->moveUpTree();
 }
 
 void Parser::parseSpace() {
     currTree->addChild("< \033[36mSpace\033[0m >");
-    match({"SPACE"});
+    match("SPACE");
     currTree->moveUpTree();
 }
 
 void Parser::parseDigit() {
     currTree->addChild("< \033[36mDigit\033[0m >");
-    match({"DIGIT"});
+    match("DIGIT");
     currTree->moveUpTree();
 }
 
 void Parser::parseBoolop() {
     currTree->addChild("< \033[36mBoolop\033[0m >");
-    match({"BOOLOP"});
+    match("BOOLOP");
     currTree->moveUpTree();
 }
 
 void Parser::parseBoolval() {
     currTree->addChild("< \033[36mBoolval\033[0m >");
-    match({"BOOLVAL"});
+    match("BOOLVAL");
     currTree->moveUpTree();
 }
 
 void Parser::parseIntop() {
     currTree->addChild("< \033[36mIntop\033[0m >");
-    match({"INTOP"});
+    match("INTOP");
     currTree->moveUpTree();
+}
+
+std::string Parser::getTokenValues(std::string token) {
+    if (token == "LBRACE") return "{";
+    else if (token == "RBRACE") return "}";
+    else if (token == "ID") return "a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z";
+    else if (token == "IF") return "if";
+    else if (token == "WHILE") return "while";
+    else if (token == "PRINT") return "print";
+    else if (token == "BOOLVAL") return "true, false";
+    else if (token == "TYPE") return "int, string, boolean";
+    else if (token == "DIGIT") return "0, 1, 2, 3, 4, 5, 6, 7, 8, 9";
+    else if (token == "ASSIGN") return "=";
+    else if (token == "BOOLOP") return "==, !=";
+    else if (token == "INTOP") return "+";
+    else if (token == "LPAREN") return "(";
+    else if (token == "RPAREN") return ")";
+    else if (token == "QUOTMARK" || token == "SPACE" || token == "CHAR") return "lowercase string of letters";
+    else if (token == "EOP") return "$";
+    else return "something else";
 }

@@ -37,7 +37,7 @@ private:
     // index of token we are on
     int tokenIndex = 0;
     // match the token name function
-    void match(std::vector<std::string> expected);
+    void match(std::string expected);
     // parse functions for each token
     void parseProgram();
     void parseBlock();
@@ -61,9 +61,6 @@ private:
     void parseBoolop();
     void parseBoolval();
     void parseIntop();
-    // a function to add node
-    // a function to move up the tree to parent node
-    // a function to match the token
-    // a function for each token possibility
-
+    // return the expected code of a token
+    std::string getTokenValues(std::string token);
 };
