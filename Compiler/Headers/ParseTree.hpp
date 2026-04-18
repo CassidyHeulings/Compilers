@@ -9,8 +9,8 @@ public:
     void moveUpTree();
     // add a child to the tree
     void addChild(const std::string& newName);
-    // retrive the pointer to the parent node from the tree
-    //Node* retrieveParent();
+    // retrieve location of the root node of the tree
+    Node& retrieveRoot();
 private:
     // root node of the tree
     Node root;

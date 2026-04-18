@@ -3,20 +3,22 @@
 
 // TODO remove charlist token
 
-Parser::Parser(Logger& loggerInstance, const std::string& processName) : logger(loggerInstance), tokens(nullptr), tokenVals(nullptr) {
+Parser::Parser(Logger& loggerInstance, const std::string& processName) 
+    : logger(loggerInstance), tokens(nullptr), tokenVals(nullptr), tokenLocs(nullptr) {
     name = processName;
     logger.test(name, "hi im the parser");
 }
 
-void Parser::setValues(std::vector<std::string>& newTokens, std::vector<std::string>& newVals) {
+void Parser::setValues(std::vector<std::string>& newTokens, std::vector<std::string>& newVals, std::vector<std::string>& newLocs) {
     tokens = &newTokens;
     tokenVals = &newVals;
+    tokenLocs = &newLocs;
 }
 
 // TODO double check
 void Parser::checkForNewTree() {
     // if there are still tokens after we are back at root node
-    if (tokens->size() > 0) {
+    if (tokenIndex < tokens->size()) {
         startParse();
     }
 }
@@ -30,6 +32,27 @@ void Parser::startParse() {
     checkForNewTree();
 }
 
+std::vector<std::unique_ptr<ParseTree>>& Parser::getTrees() {
+    return allTrees;
+}
+
+void Parser::printTree(Node& nodeLoc, int treeLevel) {
+    // for logging depth in tree
+    std::string levelString = "|";
+    for (int i = 0; i < treeLevel; i++) {
+        levelString += "--";
+    }
+    // log the node using the node name (ignore the root)
+    if (nodeLoc.getName() != "Root") {
+        logger.debug(name, levelString + " " + nodeLoc.getName());
+    }
+    // log each child of the current node using recursion
+    for (auto& child : nodeLoc.getChildren()) {
+        // if the child exists, log next child on next tree level
+        if (child) printTree(*child, treeLevel+1);
+    }
+}
+
 // match the token name
 void Parser::match(std::vector<std::string> expected) {
     bool isMatch = false;
@@ -37,7 +60,7 @@ void Parser::match(std::vector<std::string> expected) {
     while (i < expected.size() && !isMatch) {
         // if the token we are on is the expected token or token value
         if (tokens->at(tokenIndex) == expected[i]) {
-            currTree->addChild(tokenVals->at(tokenIndex));
+            currTree->addChild("[ " + tokenVals->at(tokenIndex) + " ]");
             // move to next token
             tokenIndex++;
             // found the match
@@ -45,41 +68,30 @@ void Parser::match(std::vector<std::string> expected) {
             // move up to parent, match will never have a child
             currTree->moveUpTree();
         }
+        i++;
     }
     if (!isMatch) {
-        // log error
-
-    }
-}
-
-// match the token value for tokens that have multiple values
-void Parser::matchValue(std::vector<std::string> expected) {
-    // while loop control values
-    bool isMatch = false;
-    int i = 0;
-    while (i < expected.size() && !isMatch) {
-        // if the token we are on is the expected token or token value
-        if (tokenVals->at(tokenIndex) == expected[i]) {
-            // dont add a child or change index: match() will do this
-            // found the match
-            isMatch = true;
+        // TODO error handling using logger error
+        logger.debug(name, "Error in Match at " + tokenLocs->at(tokenIndex));
+        for (std::string option : expected) {
+            logger.debug(name, "Expected " + option);
         }
-    }
-    if (!isMatch) {
-        // log error
-        
+        logger.debug(name, "Found "+ tokens->at(tokenIndex));
+        tokenIndex++;
+        currTree->moveUpTree();
     }
 }
 
 void Parser::parseProgram() {
-    currTree->addChild("Program");
+    logger.test(name, "Parse Program");
+    currTree->addChild("< \033[36mProgram\033[0m >");
     parseBlock();
     match({"EOP"});
     currTree->moveUpTree();
 }
 
 void Parser::parseBlock() {
-    currTree->addChild("Block");
+    currTree->addChild("< \033[36mBlock\033[0m >");
     match({"LBRACE"});
     parseStatementList();
     match({"RBRACE"});
@@ -87,7 +99,7 @@ void Parser::parseBlock() {
 }
 
 void Parser::parseStatementList() {
-    currTree->addChild("StatementList");
+    currTree->addChild("< \033[36mStatementList\033[0m >");
     if (tokens->at(tokenIndex) == "PRINT" ||
         tokens->at(tokenIndex) == "ID" ||
         tokens->at(tokenIndex) == "TYPE" ||
@@ -98,13 +110,13 @@ void Parser::parseStatementList() {
         parseStatementList();
     }
     else {
-        // epsilon production
+        logger.test(name, "Epsilon in statement list");
     }
     currTree->moveUpTree();
 }
 
 void Parser::parseStatement() {
-    currTree->addChild("Statement");
+    currTree->addChild("< \033[36mStatement\033[0m >");
     if (tokens->at(tokenIndex) == "PRINT") {
         parsePrintStatement();
     }
@@ -128,7 +140,7 @@ void Parser::parseStatement() {
 }
 
 void Parser::parsePrintStatement() {
-    currTree->addChild("PrintStatement");
+    currTree->addChild("< \033[36mPrintStatement\033[0m >");
     match({"PRINT"});
     match({"LPAREN"});
     parseExpr();
@@ -137,7 +149,7 @@ void Parser::parsePrintStatement() {
 }
 
 void Parser::parseAssignmentStatement() {
-    currTree->addChild("AssignmentStatement");
+    currTree->addChild("< \033[36mAssignmentStatement\033[0m >");
     parseId();
     match({"ASSIGN"});
     parseExpr();
@@ -145,14 +157,14 @@ void Parser::parseAssignmentStatement() {
 }
 
 void Parser::parseVarDecl() {
-    currTree->addChild("VarDecl");
+    currTree->addChild("< \033[36mVarDecl\033[0m >");
     parseType();
     parseId();
     currTree->moveUpTree();
 }
 
 void Parser::parseWhileStatement() {
-    currTree->addChild("WhileStatement");
+    currTree->addChild("< \033[36mWhileStatement\033[0m >");
     match({"WHILE"});
     parseBooleanExpr();
     parseBlock();
@@ -160,7 +172,7 @@ void Parser::parseWhileStatement() {
 }
 
 void Parser::parseIfStatement() {
-    currTree->addChild("IfStatement");
+    currTree->addChild("< \033[36mIfStatement\033[0m >");
     match({"IF"});
     parseBooleanExpr();
     parseBlock();
@@ -168,7 +180,7 @@ void Parser::parseIfStatement() {
 }
 
 void Parser::parseExpr() {
-    currTree->addChild("ParseExpr");
+    currTree->addChild("< \033[36mParseExpr\033[0m >");
     if (tokens->at(tokenIndex) == "DIGIT") {
         parseIntExpr();
     }
@@ -186,7 +198,7 @@ void Parser::parseExpr() {
 }
 
 void Parser::parseIntExpr() {
-    currTree->addChild("IntExpr");
+    currTree->addChild("< \033[36mIntExpr\033[0m >");
     parseDigit();
     if (tokens->at(tokenIndex) == "INTOP") {
         parseIntop();
@@ -196,7 +208,7 @@ void Parser::parseIntExpr() {
 }
 
 void Parser::parseStringExpr() {
-    currTree->addChild("ParseStringExpr");
+    currTree->addChild("< \033[36mParseStringExpr\033[0m >");
     match({"QUOTMARK"});
     parseCharList();
     match({"QUOTMARK"});
@@ -204,7 +216,7 @@ void Parser::parseStringExpr() {
 }
 
 void Parser::parseBooleanExpr() {
-    currTree->addChild("BooleanExpr");
+    currTree->addChild("< \033[36mBooleanExpr\033[0m >");
     match({"LPAREN"});
     parseExpr();
     parseBoolop();
@@ -214,13 +226,13 @@ void Parser::parseBooleanExpr() {
 }
 
 void Parser::parseId() {
-    currTree->addChild(tokenVals->at(tokenIndex));
+    currTree->addChild("< \033[36mId\033[0m >");
     match({"ID"});
     currTree->moveUpTree();
 }
 
 void Parser::parseCharList() {
-    currTree->addChild("CharList");
+    currTree->addChild("< \033[36mCharList\033[0m >");
     // all chars are under token ID
     if (tokens->at(tokenIndex) == "CHAR") {
         parseChar();
@@ -231,48 +243,49 @@ void Parser::parseCharList() {
         parseCharList();
     }
     else {
-        // epsilon production 
+        logger.test(name, "Epsilon in Charlist");
     }
+    currTree->moveUpTree();
 }
 
 void Parser::parseType() {
-    currTree->addChild(tokenVals->at(tokenIndex));
-    match({"INT", "STRING", "BOOLEAN"});
+    currTree->addChild("< \033[36mType\033[0m >");
+    match({"TYPE"});
     currTree->moveUpTree();
 }
 
 void Parser::parseChar() {
-    currTree->addChild(tokenVals->at(tokenIndex)); // will make a child for every char rn
+    currTree->addChild("< \033[36mChar\033[0m >");
     match({"CHAR"});
     currTree->moveUpTree();
 }
 
 void Parser::parseSpace() {
-    currTree->addChild(tokenVals->at(tokenIndex));
+    currTree->addChild("< \033[36mSpace\033[0m >");
     match({"SPACE"});
     currTree->moveUpTree();
 }
 
 void Parser::parseDigit() {
-    currTree->addChild(tokenVals->at(tokenIndex));
+    currTree->addChild("< \033[36mDigit\033[0m >");
     match({"DIGIT"});
     currTree->moveUpTree();
 }
 
 void Parser::parseBoolop() {
-    currTree->addChild(tokenVals->at(tokenIndex));
+    currTree->addChild("< \033[36mBoolop\033[0m >");
     match({"BOOLOP"});
     currTree->moveUpTree();
 }
 
 void Parser::parseBoolval() {
-    currTree->addChild(tokenVals->at(tokenIndex));
+    currTree->addChild("< \033[36mBoolval\033[0m >");
     match({"BOOLVAL"});
     currTree->moveUpTree();
 }
 
 void Parser::parseIntop() {
-    currTree->addChild(tokenVals->at(tokenIndex));
+    currTree->addChild("< \033[36mIntop\033[0m >");
     match({"INTOP"});
     currTree->moveUpTree();
 }

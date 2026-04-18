@@ -180,12 +180,22 @@ int main() {
 	/* ===== PARSER ===== */
 	currStage = "Parser"; // change the process to lexer
 	logger.startProcess(currStage);
-
 	logger.info(currStage, "Starting parser.");
 
 	// send the lexer values to the parser
-	//parser.setValues(tokens, tokenVals);
-	//parser.startParse();
+	parser.setValues(tokens, tokenVals, tokenLocs);
+	parser.startParse();
+	// when parse is done, get the location where all the trees are stored
+	std::vector<std::unique_ptr<ParseTree>>& parseTrees = parser.getTrees();
+
+	// print out the parse trees using a depth first in order traversal
+	int progNum = 1;
+	for (std::__1::unique_ptr<ParseTree>& tree : parseTrees) {
+		logger.debug(currStage, "\033[35mProgram #" + to_string(progNum) + "\033[0m: ");
+		// get the root node of the tree to start at level -1 of the tree (root does not print)
+		parser.printTree(tree->retrieveRoot(), -1);
+		progNum++;
+	}
 
 	// decide if end of program
 	if (logger.endProcess(currStage)) {

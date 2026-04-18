@@ -8,13 +8,17 @@ class Parser {
 public:
     Parser(Logger& loggerInstance, const std::string& processName);
     // get pointers to the addresses of the necessary vectors
-    void setValues(std::vector<std::string>& newTokens, std::vector<std::string>& newVals);
+    void setValues(std::vector<std::string>& newTokens, std::vector<std::string>& newVals, std::vector<std::string>& newLocs);
     // check if there is more tokens to parse
     void checkForNewTree();
     // to start the parse (create a new tree for each parse)
     void startParse();
     // collect the next piece of input using a pointer
     void nextToken();
+    // return the address of the vector of parse trees
+    std::vector<std::unique_ptr<ParseTree>>& getTrees();
+    // print a tree at the given node location using depth first in order traversal
+    void printTree(Node& nodeLoc, int treeLevel);
 private:
     // logger instance
     Logger& logger;
@@ -28,12 +32,12 @@ private:
     std::vector<std::string>* tokens;
     // pointer to token values from the code
     std::vector<std::string>* tokenVals;
+    // pointer to token locations from the code
+    std::vector<std::string>* tokenLocs;
     // index of token we are on
     int tokenIndex = 0;
     // match the token name function
     void match(std::vector<std::string> expected);
-    // match the token and token value
-    void matchValue(std::vector<std::string> expectedVal);
     // parse functions for each token
     void parseProgram();
     void parseBlock();

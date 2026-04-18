@@ -17,14 +17,6 @@ void ParseTree::addChild(const std::string& newName) {
     currNode = currNode->getLastChild().get();
 }
 
-/* std::unique_ptr<Node> ParseTree::retrieveChildren() {
-    // get children vector of current node and choose the first one
-    // TODO we will remove the children as we cycle through
-    std::vector<std::unique_ptr<Node>> children = currNode->getChildren();
-    return children;
-} */
-
-/* Node* ParseTree::retrieveParent() {
-    // get the pointer to the parent of the node we are on
-    currNode->getParent();
-} */
+Node& ParseTree::retrieveRoot() {
+    return root;
+}
