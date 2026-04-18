@@ -71,12 +71,12 @@ void Parser::match(std::vector<std::string> expected) {
         i++;
     }
     if (!isMatch) {
-        // TODO error handling using logger error
-        logger.debug(name, "Error in Match at " + tokenLocs->at(tokenIndex));
+        std::string possibilities = "";
         for (std::string option : expected) {
-            logger.debug(name, "Expected " + option);
+            possibilities = possibilities + option + ", ";
         }
-        logger.debug(name, "Found "+ tokens->at(tokenIndex));
+        // TODO error handling using logger error
+        logger.error(name, 2, "Expected " + possibilities + "found " + tokens->at(tokenIndex) + " at " + tokenLocs->at(tokenIndex));
         tokenIndex++;
         currTree->moveUpTree();
     }

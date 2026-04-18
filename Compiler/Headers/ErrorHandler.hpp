@@ -19,9 +19,10 @@ private:
     // number of warnings in the program
     int warningCounter;
     // possible errors
-    std::string eflags[2] = {
+    std::string eflags[3] = {
         "Invalid symbol in grammar", // error code 0
-        "Invalid token" // error code 1
+        "Invalid token", // error code 1
+        "Invalid grammar" // error code 2
     };
     std::string wflags[3] = {
         "Comment never closed", // warning code 0
