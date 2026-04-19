@@ -23,23 +23,41 @@ void Semantic::createAst(std::__1::unique_ptr<ParseTree>& cst) {
 }
 
 void Semantic::buildAst(Node& nodeLoc) {
+    // track whether a parent node was created
+    bool parentNode = false;
     // get the token name
     std::string nodeName = nodeLoc.getName();
     logger.test(name, nodeName);
+
     // check if the node is one of the tokens we want
     if (nodeName == "< \033[36mBlock\033[0m >" 
-        || nodeName == "< \033[36VarDecl\033[0 >" 
-        || nodeName == "< \033[36AssignmentStatement\033[0 >" 
-        || nodeName == "< \033[36PrintStatement\033[0 >")
+        || nodeName == "< \033[36mVarDecl\033[0m >" 
+        || nodeName == "< \033[36mAssignmentStatement\033[0m >" 
+        || nodeName == "< \033[36mPrintStatement\033[0m >") {
         // create a child in ast of the token
         currTree->addChild(nodeName);
+        // we will be moving into these nodes to create children
+        // will need to come back up from these nodes to get back to the level above
+        // we dont want to move up to the level above until after all the children are taken care of
+        parentNode = true;
+    }
     // we want the child of these tokens (their value)
-    else if (nodeName == "< Type >" || nodeName == "< Id >" || nodeName == "< Digit >")
+    else if (nodeName == "< \033[36mType\033[0m >" || nodeName == "< \033[36mId\033[0m >" || nodeName == "< \033[36mDigit\033[0m >") {
         currTree->addChild(nodeLoc.getChildren()[0]->getName()); // each will only have one child
+        // move up the tree immediately
+        currTree->moveUpTree();
+        // we do not set astNode to true - these nodes will have no children
+        // we want to move up the tree immediatly since they will never have their own children
+    }
+
+    // for each child of the node
     for (auto& child : nodeLoc.getChildren()) {
-        // move to children
+        // recursively keep building the ast
         if (child) buildAst(*child);
     }
+
+    // if a parent node was created, move up the tree to the level above
+    if (parentNode) currTree->moveUpTree();
 }
 
 void Semantic::printTree(Node& nodeLoc, int treeLevel) {
