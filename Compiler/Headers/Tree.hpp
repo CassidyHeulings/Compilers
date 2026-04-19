@@ -1,10 +1,10 @@
 #include "Node.hpp"
 #pragma once
 
-class ParseTree {
+class Tree {
 public:
     // constructor
-    ParseTree();
+    Tree();
     // move the current node pointer up the tree by 1 level
     bool moveUpTree();
     // add a child to the tree

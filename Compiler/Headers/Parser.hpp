@@ -1,6 +1,6 @@
 #include <string>
 #include "Logger.hpp"
-#include "ParseTree.hpp"
+#include "Tree.hpp"
 #pragma once
 
 // class to hold parser information and functions
@@ -16,7 +16,7 @@ public:
     // collect the next piece of input using a pointer
     void nextToken();
     // return the address of the vector of parse trees
-    std::vector<std::unique_ptr<ParseTree>>& getTrees();
+    std::vector<std::unique_ptr<Tree>>& getTrees();
     // print a tree at the given node location using depth first in order traversal
     void printTree(Node& nodeLoc, int treeLevel);
 private:
@@ -25,9 +25,9 @@ private:
     // name of this process for the logger
     std::string name;
     // store the pointers to each tree
-    std::vector<std::unique_ptr<ParseTree>> allTrees;
+    std::vector<std::unique_ptr<Tree>> allTrees;
     // pointer to current tree
-    ParseTree* currTree = nullptr;
+    Tree* currTree = nullptr;
     // pointer to tokens produced by lexer
     std::vector<std::string>* tokens;
     // pointer to token values from the code

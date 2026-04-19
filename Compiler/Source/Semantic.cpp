@@ -6,14 +6,9 @@ Semantic::Semantic(Logger& loggerInstance, const std::string& processName)
     logger.test(name, "hi im semantic analysis");
 }
 
-/* void Semantic::setValues(std::vector<std::string>& newTokens, std::vector<std::string>& newVals) {
-    tokens = &newTokens;
-    tokenVals = &newVals;
-} */
-
-void Semantic::createAst(std::__1::unique_ptr<ParseTree>& cst) {
+void Semantic::createAst(std::__1::unique_ptr<Tree>& cst) {
     // add a new ast to the list of trees
-    allTrees.push_back(std::make_unique<AbstractTree>());
+    allTrees.push_back(std::make_unique<Tree>());
     // set the current tree pointer to the new tree added to vector
     currTree = allTrees.back().get();
     // retrieve the root node of the tree
@@ -85,14 +80,6 @@ void Semantic::buildAst(Node& nodeLoc) {
     if (parentNode) currTree->moveUpTree();
 }
 
-void Semantic::addToString(char letter) {
-    currString += letter;
-}
-
-void Semantic::resetString() {
-    currString = "";
-}
-
 void Semantic::printTree(Node& nodeLoc, int treeLevel) {
     // for logging depth in tree
     std::string levelString = "|";
@@ -110,6 +97,6 @@ void Semantic::printTree(Node& nodeLoc, int treeLevel) {
     }
 }
 
-std::vector<std::unique_ptr<AbstractTree>>& Semantic::getTrees() {
+std::vector<std::unique_ptr<Tree>>& Semantic::getTrees() {
     return allTrees;
 }

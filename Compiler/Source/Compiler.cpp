@@ -194,11 +194,11 @@ int main() {
 	parser.setValues(tokens, tokenVals, tokenLocs);
 	parser.startParse();
 	// when parse is done, get the location where all the trees are stored
-	std::vector<std::unique_ptr<ParseTree>>& parseTrees = parser.getTrees();
+	std::vector<std::unique_ptr<Tree>>& parseTrees = parser.getTrees();
 
 	// print out the parse trees using a depth first in order traversal
 	int progNum = 1;
-	for (std::__1::unique_ptr<ParseTree>& tree : parseTrees) {
+	for (std::__1::unique_ptr<Tree>& tree : parseTrees) {
 		logger.debug(currStage, "\033[35mProgram #" + to_string(progNum) + "\033[0m: ");
 		// get the root node of the tree to start at level -1 of the tree (root does not print)
 		parser.printTree(tree->retrieveRoot(), -1);
@@ -218,16 +218,16 @@ int main() {
 	logger.info(currStage, "Starting semantic analysis.");
 
 	// turn each cst into a ast
-	for (std::__1::unique_ptr<ParseTree>& tree : parseTrees) {
+	for (std::__1::unique_ptr<Tree>& tree : parseTrees) {
 		semantic.createAst(tree);
 	}
 
 	// get the vector of abstract syntax trees
-	std::vector<std::unique_ptr<AbstractTree>>& abstractTrees = semantic.getTrees();
+	std::vector<std::unique_ptr<Tree>>& abstractTrees = semantic.getTrees();
 
 	// print each tree
 	progNum = 1;
-	for (std::__1::unique_ptr<AbstractTree>& tree : abstractTrees) {
+	for (std::__1::unique_ptr<Tree>& tree : abstractTrees) {
 		logger.debug(currStage, "\033[35mProgram #" + to_string(progNum) + "\033[0m: ");
 		semantic.printTree(tree->retrieveRoot(), -1);
 		progNum++;

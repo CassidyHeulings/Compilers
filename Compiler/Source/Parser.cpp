@@ -23,14 +23,14 @@ void Parser::checkForNewTree() {
 
 void Parser::startParse() {
     // add a new tree to the list of trees
-    allTrees.push_back(std::make_unique<ParseTree>());
+    allTrees.push_back(std::make_unique<Tree>());
     // set the current tree pointer to the new tree added to vector
     currTree = allTrees.back().get();
     parseProgram();
     checkForNewTree();
 }
 
-std::vector<std::unique_ptr<ParseTree>>& Parser::getTrees() {
+std::vector<std::unique_ptr<Tree>>& Parser::getTrees() {
     return allTrees;
 }
 

@@ -1,13 +1,13 @@
-#include "../Headers/ParseTree.hpp"
+#include "../Headers/Tree.hpp"
 
-ParseTree::ParseTree() : root("Root", nullptr), currNode(&root) {
+Tree::Tree() : root("Root", nullptr), currNode(&root) {
     // the root node will have a null parent node
     // it is the root of the tree
     // set the current node pointer to the address of the root node
     // this is the node we start on
 }
 
-bool ParseTree::moveUpTree() {
+bool Tree::moveUpTree() {
     // avoid segmentation fault
     if (currNode->getParent()) {
         currNode = currNode->getParent();
@@ -16,12 +16,12 @@ bool ParseTree::moveUpTree() {
     return false;
 }
 
-void ParseTree::addChild(const std::string& newName) {
+void Tree::addChild(const std::string& newName) {
     currNode->addChild(newName);
     // set the current node to this new child node
     currNode = currNode->getLastChild().get();
 }
 
-Node& ParseTree::retrieveRoot() {
+Node& Tree::retrieveRoot() {
     return root;
 }
