@@ -11,6 +11,7 @@ using namespace std;
 #include "../Headers/Parser.hpp"
 #include "../Headers/Semantic.hpp"
 
+// TODO make printing both trees pretty again
 // TODO check for functions/vars not being used
 // TODO do one program at a time
 // TODO log errors and warnings for each process

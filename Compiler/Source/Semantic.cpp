@@ -30,10 +30,10 @@ void Semantic::buildAst(Node& nodeLoc) {
     logger.test(name, nodeName);
 
     // check if the node is one of the tokens we want
-    if (nodeName == "< \033[36mBlock\033[0m >" 
-        || nodeName == "< \033[36mVarDecl\033[0m >" 
-        || nodeName == "< \033[36mAssignmentStatement\033[0m >" 
-        || nodeName == "< \033[36mPrintStatement\033[0m >") {
+    if (nodeName == "Block" 
+        || nodeName == "VarDecl" 
+        || nodeName == "AssignmentStatement" 
+        || nodeName == "PrintStatement") {
         // create a child in ast of the token
         currTree->addChild(nodeName);
         // we will be moving into these nodes to create children
@@ -42,7 +42,7 @@ void Semantic::buildAst(Node& nodeLoc) {
         parentNode = true;
     }
     // we want the child of these tokens (their value)
-    else if (nodeName == "< \033[36mType\033[0m >" || nodeName == "< \033[36mId\033[0m >" || nodeName == "< \033[36mDigit\033[0m >") {
+    else if (nodeName == "Type" || nodeName == "Id" || nodeName == "Digit") {
         currTree->addChild(nodeLoc.getChildren()[0]->getName()); // each will only have one child
         // move up the tree immediately
         currTree->moveUpTree();
@@ -68,7 +68,7 @@ void Semantic::printTree(Node& nodeLoc, int treeLevel) {
     }
     // log the node using the node name (ignore the root)
     if (nodeLoc.getName() != "Root") {
-        logger.debug(name, levelString + " " + nodeLoc.getName());
+        logger.debug(name, levelString + " " + "\033[36m" + nodeLoc.getName() + "\033[0m");
     }
     // log each child of the current node using recursion
     for (auto& child : nodeLoc.getChildren()) {
