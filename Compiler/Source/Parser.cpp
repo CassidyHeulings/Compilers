@@ -182,14 +182,14 @@ void Parser::parseIfStatement() {
 }
 
 void Parser::parseExpr() {
-    currTree->addChild("< \033[36mParseExpr\033[0m >");
+    currTree->addChild("< \033[36mExpr\033[0m >");
     if (tokens->at(tokenIndex) == "DIGIT") {
         parseIntExpr();
     }
     else if (tokens->at(tokenIndex) == "QUOTMARK") {
         parseStringExpr();
     }
-    else if (tokens->at(tokenIndex) == "LPAREN") {
+    else if (tokens->at(tokenIndex) == "LPAREN" || tokens->at(tokenIndex) == "BOOLVAL") {
         parseBooleanExpr();
     }
     else if (tokens->at(tokenIndex) == "ID") {
@@ -210,7 +210,7 @@ void Parser::parseIntExpr() {
 }
 
 void Parser::parseStringExpr() {
-    currTree->addChild("< \033[36mParseStringExpr\033[0m >");
+    currTree->addChild("< \033[36mStringExpr\033[0m >");
     match("QUOTMARK");
     parseCharList();
     match("QUOTMARK");
@@ -219,11 +219,16 @@ void Parser::parseStringExpr() {
 
 void Parser::parseBooleanExpr() {
     currTree->addChild("< \033[36mBooleanExpr\033[0m >");
-    match("LPAREN");
-    parseExpr();
-    parseBoolop();
-    parseExpr();
-    match("RPAREN");
+    if (tokens->at(tokenIndex) == "LPAREN") {
+        match("LPAREN");
+        parseExpr();
+        parseBoolop();
+        parseExpr();
+        match("RPAREN");
+    }
+    else if (tokens->at(tokenIndex) == "BOOLVAL") {
+        match("BOOLVAL");
+    }
     currTree->moveUpTree();
 }
 
@@ -262,6 +267,7 @@ void Parser::parseChar() {
     currTree->moveUpTree();
 }
 
+// TODO keep space child?
 void Parser::parseSpace() {
     currTree->addChild("< \033[36mSpace\033[0m >");
     match("SPACE");
