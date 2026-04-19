@@ -9,8 +9,13 @@ using namespace std;
 #include "../Headers/Logger.hpp"
 #include "../Headers/Lexer.hpp"
 #include "../Headers/Parser.hpp"
+#include "../Headers/Semantic.hpp"
 
-// TODO NO SPACE
+// TODO make printing both trees pretty again
+// TODO check for functions/vars not being used
+// TODO do one program at a time
+// TODO log errors and warnings for each process
+// TODO make sure all necessary parts are in AST
 
 int main() {
 	/* ===== CONSTRUCT CLASS INSTANCES ===== */
@@ -24,6 +29,8 @@ int main() {
 	logger.debug(currStage, "Lexer is ready.");
 	Parser parser(logger, "Parser");
 	logger.debug(currStage, "Parser is ready.");
+	Semantic semantic(logger, "Semantic Analysis");
+	logger.debug(currStage, "Semantic analyzer is ready.");
 	logger.endProcess(currStage);
 
 
@@ -177,6 +184,7 @@ int main() {
 		return 1; 
 	}
 
+
 	/* ===== PARSER ===== */
 	currStage = "Parser"; // change the process to lexer
 	logger.startProcess(currStage);
@@ -199,13 +207,40 @@ int main() {
 
 	// if any errors occured, end the program
 	if (logger.endProcess(currStage)) {
-		// this will only happen if debug is on, as parse errors are caught during process
-		logger.warning(currStage, 3, "Fix first error and try again.");
 		logger.endProgram();
 		return 1; 
 	}
 
-	/* ===== NEXT PROCESS ===== */
+
+	/* ===== SEMANTIC ANALYSIS ===== */
+	currStage = "Semantic Analysis"; // set the new stage
+	logger.startProcess(currStage);
+	logger.info(currStage, "Starting semantic analysis.");
+
+	// turn each cst into a ast
+	for (std::__1::unique_ptr<ParseTree>& tree : parseTrees) {
+		semantic.createAst(tree);
+	}
+
+	// get the vector of abstract syntax trees
+	std::vector<std::unique_ptr<AbstractTree>>& abstractTrees = semantic.getTrees();
+
+	// print each tree
+	progNum = 1;
+	for (std::__1::unique_ptr<AbstractTree>& tree : abstractTrees) {
+		logger.debug(currStage, "\033[35mProgram #" + to_string(progNum) + "\033[0m: ");
+		semantic.printTree(tree->retrieveRoot(), -1);
+		progNum++;
+	}
+
+	// if any errors occured, end the program
+	if (logger.endProcess(currStage)) {
+		logger.endProgram();
+		return 1; 
+	}
+
+
+	/* ===== NEXT STAGE ===== */
 
 
 	/* ===== END OF COMPILE ===== */
