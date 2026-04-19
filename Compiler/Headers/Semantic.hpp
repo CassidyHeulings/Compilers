@@ -10,8 +10,6 @@ public:
     //void setValues(std::vector<std::string>& newTokens, std::vector<std::string>& newVals);
     // start a new ast using a cst
     void createAst(std::__1::unique_ptr<ParseTree>& cst);
-    // add children to the tree
-    void buildAst(Node& currNode);
     // print out the ast
     void printTree(Node& nodeLoc, int treeLevel);
     // get all ast trees
@@ -25,10 +23,12 @@ private:
     std::vector<std::unique_ptr<AbstractTree>> allTrees;
     // pointer to current tree
     AbstractTree* currTree = nullptr;
-    // pointer to tokens produced by lexer
-    //std::vector<std::string>* tokens;
-    // pointer to token values from the code
-    //std::vector<std::string>* tokenVals;
-    // index of token we are on
-    //int tokenIndex = 0;
+    // used to turn chars in a charlist into a full string for ast
+    std::string currString = "";
+    // add children to the tree
+    void buildAst(Node& currNode);
+    // return the string of a charlist
+    void addToString(char letter);
+    // reset the string variable we are working on to an empty string
+    void resetString();
 };

@@ -56,6 +56,24 @@ void Semantic::buildAst(Node& nodeLoc) {
         // we do not set astNode to true - these nodes will have no children
         // we want to move up the tree immediatly since they will never have their own children
     }
+    // check for strings (charlists)
+    else if (nodeName == "\"") {
+        // add quotes
+        currString += nodeName;
+        // if it is the end of the string
+        if (currString.size() > 1) {
+            // add the string as an ast node
+            currTree->addChild(currString);
+            // move back up the tree -> this node will have no children
+            currTree->moveUpTree();
+            // make string empty for next string
+            currString = "";
+        }
+    }
+    else if (nodeName == "Char" || nodeName == "Space") {
+        // add the next char of the charlist to the string
+        currString += nodeLoc.getChildren()[0]->getName();
+    }
 
     // for each child of the node
     for (auto& child : nodeLoc.getChildren()) {
@@ -65,6 +83,14 @@ void Semantic::buildAst(Node& nodeLoc) {
 
     // if a parent node was created, move up the tree to the level above
     if (parentNode) currTree->moveUpTree();
+}
+
+void Semantic::addToString(char letter) {
+    currString += letter;
+}
+
+void Semantic::resetString() {
+    currString = "";
 }
 
 void Semantic::printTree(Node& nodeLoc, int treeLevel) {
