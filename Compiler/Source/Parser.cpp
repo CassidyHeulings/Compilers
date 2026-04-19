@@ -69,18 +69,10 @@ void Parser::match(std::string expected) {
         i++;
     }
     if (!isMatch) {
-        // TODO error handling using logger error
         logger.error(name, 2, "Expected " + getTokenValues(expected) + " found " + tokenVals->at(tokenIndex) + " at " + tokenLocs->at(tokenIndex));
-        // end the program if debug is not on
-        if (!logger.getDebug()) {
-            logger.endProgram();
-            std::exit(0);
-        }
-        // continue after error
-        else {
-            tokenIndex++;
-            if (currTree->moveUpTree()) currTree->moveUpTree();
-        }
+        // end the program
+        logger.endProgram();
+        std::exit(0);
     }
 }
 
@@ -227,7 +219,7 @@ void Parser::parseBooleanExpr() {
         match("RPAREN");
     }
     else if (tokens->at(tokenIndex) == "BOOLVAL") {
-        match("BOOLVAL");
+        parseBoolval();
     }
     currTree->moveUpTree();
 }

@@ -33,7 +33,9 @@ void Semantic::buildAst(Node& nodeLoc) {
     if (nodeName == "Block" 
         || nodeName == "VarDecl" 
         || nodeName == "AssignmentStatement" 
-        || nodeName == "PrintStatement") {
+        || nodeName == "PrintStatement"
+        || nodeName == "IfStatement"
+        || nodeName == "WhileStatement") {
         // create a child in ast of the token
         currTree->addChild(nodeName);
         // we will be moving into these nodes to create children
@@ -42,7 +44,12 @@ void Semantic::buildAst(Node& nodeLoc) {
         parentNode = true;
     }
     // we want the child of these tokens (their value)
-    else if (nodeName == "Type" || nodeName == "Id" || nodeName == "Digit") {
+    else if (nodeName == "Type" 
+        || nodeName == "Id" 
+        || nodeName == "Digit" 
+        || nodeName == "Boolval"
+        || nodeName == "Boolop"
+        || nodeName == "Intop") {
         currTree->addChild(nodeLoc.getChildren()[0]->getName()); // each will only have one child
         // move up the tree immediately
         currTree->moveUpTree();

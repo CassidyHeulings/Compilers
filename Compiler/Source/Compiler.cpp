@@ -15,6 +15,7 @@ using namespace std;
 // TODO check for functions/vars not being used
 // TODO do one program at a time
 // TODO log errors and warnings for each process
+// TODO make sure all necessary parts are in AST
 
 int main() {
 	/* ===== CONSTRUCT CLASS INSTANCES ===== */
@@ -206,8 +207,6 @@ int main() {
 
 	// if any errors occured, end the program
 	if (logger.endProcess(currStage)) {
-		// this will only happen if debug is on, as parse errors are caught during process
-		logger.warning(currStage, 3, "Fix first error and try again.");
 		logger.endProgram();
 		return 1; 
 	}

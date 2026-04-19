@@ -1,13 +1,17 @@
 {
     int a
-    boolean b
     {
-        string c
-        a = 5
-        b = true /* no comment */
-        c = "inta"
-        print(c)
+        boolean b
+        {
+            string c
+            {
+                a = 5
+                b = false
+                c = "inta"
+            }
+            print(c)
+        }
+        print(b)
     }
-    print(b)
     print(a)
 }$
