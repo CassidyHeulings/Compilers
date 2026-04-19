@@ -8,17 +8,22 @@ using namespace std;
 #include "../Headers/ErrorHandler.hpp"
 #include "../Headers/Logger.hpp"
 #include "../Headers/Lexer.hpp"
+#include "../Headers/Parser.hpp"
+
+// TODO NO SPACE
 
 int main() {
 	/* ===== CONSTRUCT CLASS INSTANCES ===== */
 	std::string currStage = "Initialization"; // current part of the compiler we are on for logging
 	ErrorHandler errorHandler;
-	Logger logger(errorHandler, true, false);
+	Logger logger(errorHandler, true, false); // errorHandler instance, debugger on, tester on
 	logger.startProcess(currStage);
 	logger.info(currStage, "Initializing compiler.");
 	// initialize each part of compiler
 	Lexer lexer(logger, "Lexer");
 	logger.debug(currStage, "Lexer is ready.");
+	Parser parser(logger, "Parser");
+	logger.debug(currStage, "Parser is ready.");
 	logger.endProcess(currStage);
 
 
@@ -79,9 +84,14 @@ int main() {
 			if (currChar == '\n') {
 				lineCount++; // increase line count
 				charCount = 1; // reset character count in line
+				currCharNum++;
+				continue;
 			}
-			currCharNum++;
-			continue; // move to next char
+			// if we are not in quotes ignore spaces
+			if (currChar == ' ' && !lexer.getIsQuotes()) {
+				currCharNum++;
+				continue; // move to next char
+			}
 		}
 
 		// check if starting a comment
@@ -115,15 +125,25 @@ int main() {
 		if (lexer.isCompleteToken(currChar, nextChar)) {
 			// get the token
 			tokenName = lexer.getToken();
-			tokens.push_back(tokenName);
-			// get the value of the token
-			tokenVal = lexer.getTokenValue();
-			tokenVals.push_back(tokenVal);
-			// store the location of the token
-			tokenLocs.push_back("[" + to_string(lineCount) + ":" + to_string(charCount) + "]");
-			// log the token and location
-			logger.debug(currStage, "\033[36m" + tokenName + "\033[0m [ " + tokenVal + " ] found at [" + to_string(lineCount) + ":" + to_string(charCount - tokenVal.length()) + "]");
-			// store the token
+			if (tokenName == "TRYAGAIN") {
+				// move back to starting char of incomplete token
+				currCharNum = currCharNum - lexer.getBufferLength();
+				charCount = charCount - lexer.getBufferLength();
+			}
+			else {
+				// store the token name
+				tokens.push_back(tokenName);
+				// get the value of the token
+				tokenVal = lexer.getTokenValue();
+				// store the token value
+				tokenVals.push_back(tokenVal);
+				// store the location of the token
+				tokenLocs.push_back("[" + to_string(lineCount) + ":" + to_string(charCount) + "]");
+				// log the token and location
+				logger.debug(currStage, "\033[36m" + tokenName + "\033[0m [ " + tokenVal + " ] found at [" + to_string(lineCount) + ":" + to_string(charCount - tokenVal.length()) + "]");
+				// reset the max buffer
+				lexer.resetMaxBuffer();
+			}
 			lexer.clearBuffer(); // clear buffer for next token
 			lexer.resetState(); // reset the state for the next token
 		}
@@ -153,13 +173,43 @@ int main() {
 
 	// decide if end of program
 	if (logger.endProcess(currStage)) {
-		logger.endProgram(currStage);
+		logger.endProgram();
 		return 1; 
 	}
 
-	/* ===== NEXT STAGE ===== */
+	/* ===== PARSER ===== */
+	currStage = "Parser"; // change the process to lexer
+	logger.startProcess(currStage);
+	logger.info(currStage, "Starting parser.");
 
+	// send the lexer values to the parser
+	parser.setValues(tokens, tokenVals, tokenLocs);
+	parser.startParse();
+	// when parse is done, get the location where all the trees are stored
+	std::vector<std::unique_ptr<ParseTree>>& parseTrees = parser.getTrees();
+
+	// print out the parse trees using a depth first in order traversal
+	int progNum = 1;
+	for (std::__1::unique_ptr<ParseTree>& tree : parseTrees) {
+		logger.debug(currStage, "\033[35mProgram #" + to_string(progNum) + "\033[0m: ");
+		// get the root node of the tree to start at level -1 of the tree (root does not print)
+		parser.printTree(tree->retrieveRoot(), -1);
+		progNum++;
+	}
+
+	// if any errors occured, end the program
+	if (logger.endProcess(currStage)) {
+		// this will only happen if debug is on, as parse errors are caught during process
+		logger.warning(currStage, 3, "Fix first error and try again.");
+		logger.endProgram();
+		return 1; 
+	}
+
+	/* ===== NEXT PROCESS ===== */
+
+
+	/* ===== END OF COMPILE ===== */
 	// print end of program line
-	logger.endProgram("Program");
+	logger.endProgram();
 	return 0;
 }

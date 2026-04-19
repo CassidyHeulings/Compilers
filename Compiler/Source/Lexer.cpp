@@ -2,7 +2,10 @@
 
 Lexer::Lexer(Logger& loggerInstance, const std::string& processName) : logger(loggerInstance) {
     name = processName;
+    logger.test(name, "hi im the lexer");
+    isQuotes = false;
     buffer = ""; // set buffer to empty
+    maxBuffer = INT_MAX;
     currState = 1; // start at first state
 }
 
@@ -12,6 +15,18 @@ void Lexer::clearBuffer() {
 
 void Lexer::resetState() {
     currState = 1; // reset the state
+}
+
+void Lexer::resetMaxBuffer() {
+    maxBuffer = INT_MAX;
+}
+
+bool Lexer::getIsQuotes() {
+    return isQuotes;
+}
+
+int Lexer::getBufferLength() {
+    return buffer.length();
 }
 
 int Lexer::findIndex(char charVal) {
@@ -48,6 +63,11 @@ bool Lexer::isCompleteToken(char currChar, char nextChar) {
     int currColumnVal = findIndex(currChar); // index of curr char in matrix
     int nextColumnVal = findIndex(nextChar); // index of next char in matrix
 
+    if (isQuotes) {
+        // everything in quotes is either a char or space if a valid symbol
+        maxBuffer = 1;
+    }
+
     // the next state
     int nextState;
     if (currColumnVal == -1) { // invalid symbol
@@ -63,13 +83,17 @@ bool Lexer::isCompleteToken(char currChar, char nextChar) {
 
     bool acceptingState = isAcceptingState(nextState); // check if next state is accepting
 
-    // end of token
+    // end of token either by state
     if (nextCharNextState == 0) {
-        // invalid token
+        // completed the token
         if (acceptingState) {
-            // completed the token
             isToken = true;
         }
+    }
+
+    // end of token early from max buffer
+    if (buffer.length() == maxBuffer) {
+        isToken = true;
     }
 
     currState = nextState; // set the current state as the next state
@@ -91,9 +115,10 @@ std::string Lexer::getToken() {
         case 14:
         case 18:
         case 23:
-        case 29:
         case 31:
         case 38:
+            if (isQuotes) 
+                return "CHAR";
             return "ID";
             break;
         case 3:
@@ -114,28 +139,8 @@ std::string Lexer::getToken() {
         case 37:
             return "TYPE";
             break;
-        case 5:
-        case 6:
-        case 7:
-        case 10:
-        case 11:
-        case 12:
-        case 15:
-        case 16:
-        case 19:
-        case 20:
-        case 21:
-        case 24:
-        case 25:
-        case 26:
-        case 27:
-        case 32:
-        case 33:
-        case 34:
-        case 35:
-        case 36:
         case 39:
-            return "CHARLIST";
+            return "SPACE";
             break;
         case 40:
             return "DIGIT";
@@ -162,13 +167,23 @@ std::string Lexer::getToken() {
             return "RPAREN";
             break;
         case 49:
+            // toggle quotes
+            isQuotes = !isQuotes;
             return "QUOTMARK";
             break;
         case 50:
             return "EOP";
         default:
-            logger.error(name, 1, buffer);
-            return "\033[31mERROR\033[0m";
+            // try again with one less
+            if (buffer.length() > 1) {
+                maxBuffer = buffer.length() - 1;
+                logger.test(name, "max buffer" + std::to_string(maxBuffer));
+                return "TRYAGAIN";
+            }
+            else {
+                logger.error(name, 1, buffer);
+                return "\033[31mERROR\033[0m";
+            }
             break;
     }
 }

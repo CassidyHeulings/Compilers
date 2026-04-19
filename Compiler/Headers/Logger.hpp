@@ -22,5 +22,7 @@ public:
     // checks if the program ends due to errors - checked at the end of every stage
     bool endProcess(const std::string& currProcess);
     // print warning and error count in entire program
-    void endProgram(const std::string& currProcess);
+    void endProgram();
+    // get the value of debug
+    bool getDebug();
 };
