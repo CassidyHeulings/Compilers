@@ -11,6 +11,9 @@ using namespace std;
 #include "../Headers/Parser.hpp"
 #include "../Headers/Semantic.hpp"
 
+// TODO check for functions/vars not being used
+// TODO do one program at a time
+// TODO log errors and warnings for each process
 
 int main() {
 	/* ===== CONSTRUCT CLASS INSTANCES ===== */
@@ -214,10 +217,24 @@ int main() {
 	logger.startProcess(currStage);
 	logger.info(currStage, "Starting semantic analysis.");
 
+	// turn each cst into a ast
+	for (std::__1::unique_ptr<ParseTree>& tree : parseTrees) {
+		semantic.createAst(tree);
+	}
+
+	// get the vector of abstract syntax trees
+	std::vector<std::unique_ptr<AbstractTree>>& abstractTrees = semantic.getTrees();
+
+	// print each tree
+	progNum = 1;
+	for (std::__1::unique_ptr<AbstractTree>& tree : abstractTrees) {
+		logger.debug(currStage, "\033[35mProgram #" + to_string(progNum) + "\033[0m: ");
+		semantic.printTree(tree->retrieveRoot(), -1);
+		progNum++;
+	}
+
 	// if any errors occured, end the program
 	if (logger.endProcess(currStage)) {
-		// this will only happen if debug is on, as parse errors are caught during process
-		logger.warning(currStage, 3, "Fix first error and try again.");
 		logger.endProgram();
 		return 1; 
 	}
@@ -225,7 +242,7 @@ int main() {
 
 	/* ===== NEXT STAGE ===== */
 
-	
+
 	/* ===== END OF COMPILE ===== */
 	// print end of program line
 	logger.endProgram();

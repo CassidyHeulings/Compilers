@@ -17,11 +17,11 @@ public:
     // return the name of the node
     const std::string& getName();
 private:
-    // name of node
+    // name of node (will double as key in symbol table)
     std::string name;
     // pointer to the parent node
     Node* parent;
     // vector of the pointers to children of the node
     std::vector<std::unique_ptr<Node>> children;
-    
+    // TODO edit for symbol table usage
 };

@@ -1,9 +1,10 @@
 #include "ParseTree.hpp"
 #pragma once
 
-// symbol table that will hold values for the AST
+// abstract syntax tree
 // extends the parse tree as we still want the tree and node functionality
-class AbstractTree : ParseTree {
+// own class for name and organization
+class AbstractTree : public ParseTree {
 public:
     // constructor
     AbstractTree();
