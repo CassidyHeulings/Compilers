@@ -9,8 +9,8 @@ using namespace std;
 #include "../Headers/Logger.hpp"
 #include "../Headers/Lexer.hpp"
 #include "../Headers/Parser.hpp"
+#include "../Headers/Semantic.hpp"
 
-// TODO NO SPACE
 
 int main() {
 	/* ===== CONSTRUCT CLASS INSTANCES ===== */
@@ -24,6 +24,8 @@ int main() {
 	logger.debug(currStage, "Lexer is ready.");
 	Parser parser(logger, "Parser");
 	logger.debug(currStage, "Parser is ready.");
+	Semantic semantic(logger, "Semantic Analysis");
+	logger.debug(currStage, "Semantic analyzer is ready.");
 	logger.endProcess(currStage);
 
 
@@ -177,6 +179,7 @@ int main() {
 		return 1; 
 	}
 
+
 	/* ===== PARSER ===== */
 	currStage = "Parser"; // change the process to lexer
 	logger.startProcess(currStage);
@@ -205,9 +208,24 @@ int main() {
 		return 1; 
 	}
 
-	/* ===== NEXT PROCESS ===== */
+
+	/* ===== SEMANTIC ANALYSIS ===== */
+	currStage = "Semantic Analysis"; // set the new stage
+	logger.startProcess(currStage);
+	logger.info(currStage, "Starting semantic analysis.");
+
+	// if any errors occured, end the program
+	if (logger.endProcess(currStage)) {
+		// this will only happen if debug is on, as parse errors are caught during process
+		logger.warning(currStage, 3, "Fix first error and try again.");
+		logger.endProgram();
+		return 1; 
+	}
 
 
+	/* ===== NEXT STAGE ===== */
+
+	
 	/* ===== END OF COMPILE ===== */
 	// print end of program line
 	logger.endProgram();
