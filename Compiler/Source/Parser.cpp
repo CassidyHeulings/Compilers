@@ -71,6 +71,7 @@ void Parser::match(std::string expected) {
     if (!isMatch) {
         logger.error(name, 2, "Expected " + getTokenValues(expected) + " found " + tokenVals->at(tokenIndex) + " at " + tokenLocs->at(tokenIndex));
         // end the program
+        logger.endProcess(name);
         logger.endProgram();
         std::exit(0);
     }
