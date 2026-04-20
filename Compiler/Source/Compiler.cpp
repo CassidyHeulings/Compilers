@@ -13,6 +13,8 @@ using namespace std;
 
 // TODO make printing both trees pretty again
 // TODO make sure all necessary parts are in AST
+// use warning code 3 if printing cst after an error
+// make input file, test var, and debug var part of the command
 
 void compile(std::string program, int progNum, std::string currStage, Logger& logger, Lexer& lexer, Parser& parser, Semantic& semantic) {
 	// log the program number we are on
@@ -47,6 +49,8 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 	std::vector<std::string> tokenLocs; // stores the locations of tokens in input
 
 	logger.info(currStage, "Starting lexing.");
+	lexer.newProgram();
+
 	// loop through each character in the program
 	while (currCharNum < programLength) {
 		currChar = program[currCharNum]; // set the value of the character

@@ -9,6 +9,13 @@ Lexer::Lexer(Logger& loggerInstance, const std::string& processName) : logger(lo
     currState = 1; // start at first state
 }
 
+void Lexer::newProgram() {
+    clearBuffer();
+    resetState();
+    resetMaxBuffer();
+    isQuotes = false;
+}
+
 void Lexer::clearBuffer() {
     buffer = ""; // set buffer to empty
 }

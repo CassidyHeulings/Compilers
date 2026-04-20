@@ -9,6 +9,8 @@ Semantic::Semantic(Logger& loggerInstance, const std::string& processName)
 void Semantic::createAst(std::__1::unique_ptr<Tree>& cst) {
     // create a pointer to the tree
     tree = std::make_unique<Tree>();
+    // make sure string starts empty in between programs
+    currString = "";
     // retrieve the root node of the tree
     Node& root = cst->retrieveRoot();
     // start building the ast

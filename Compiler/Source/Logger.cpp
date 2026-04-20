@@ -55,7 +55,9 @@ bool Logger::endProcess(const std::string& currProcess) {
 void Logger::endProgram() {
     int numErrors = errorHandler.getNumAllErrors();
     int numWarnings = errorHandler.getNumAllWarnings();
-    std::cout << "\n~~~~~~ \033[35mPrograms\033[0m have \033[31m" << numErrors << " errors\033[0m and \033[33m" << numWarnings << " warnings\033[0m ~~~~~~" << std::endl;
+    std::cout << "\n\033[36m===================================================\033[0m" << std::endl;
+    std::cout << "~~~~~~ \033[35mPrograms\033[0m have \033[31m" << numErrors << " errors\033[0m and \033[33m" << numWarnings << " warnings\033[0m ~~~~~~" << std::endl;
+    std::cout << "\033[36m===================================================\033[0m" << std::endl;
 }
 
 bool Logger::getDebug() {
