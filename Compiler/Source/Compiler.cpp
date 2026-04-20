@@ -6,7 +6,6 @@
 #include <sstream>
 using namespace std;
 // headers
-#include "../Headers/ErrorHandler.hpp"
 #include "../Headers/Logger.hpp"
 #include "../Headers/Lexer.hpp"
 #include "../Headers/Parser.hpp"
@@ -15,8 +14,8 @@ using namespace std;
 // TODO make printing both trees pretty again
 // TODO make sure all necessary parts are in AST
 
-void compile(std::string program, int progNum, std::string currStage, ErrorHandler& errorHandler, Logger& logger, Lexer& lexer, Parser& parser, Semantic& semantic) {
-	// log the stage we are on
+void compile(std::string program, int progNum, std::string currStage, Logger& logger, Lexer& lexer, Parser& parser, Semantic& semantic) {
+	// log the program number we are on
 	logger.startProgram(progNum);
 
 	/* === PREPARE COMPILE === */
@@ -28,7 +27,6 @@ void compile(std::string program, int progNum, std::string currStage, ErrorHandl
 	// log input information
 	logger.test(currStage, "Input: " + program);
 	logger.test(currStage, "input length: " + to_string(programLength));
-
 	logger.endProcess(currStage);
 
 
@@ -176,7 +174,7 @@ void compile(std::string program, int progNum, std::string currStage, ErrorHandl
 	if (logger.endProcess(currStage)) {
 		return; 
 	}
-	
+
 
 	/* ===== SEMANTIC ANALYSIS ===== */
 	currStage = "Semantic Analysis"; // set the new stage
@@ -205,8 +203,7 @@ void compile(std::string program, int progNum, std::string currStage, ErrorHandl
 int main() {
 	/* ===== CONSTRUCT CLASS INSTANCES ===== */
 	std::string currStage = "Initialization"; // current part of the compiler we are on for logging
-	ErrorHandler errorHandler;
-	Logger logger(errorHandler, true, false); // errorHandler instance, debugger on, tester on
+	Logger logger(true, false); // debugger on, tester on
 	logger.startProcess(currStage);
 	logger.info(currStage, "Initializing compiler.");
 	// initialize each part of compiler
@@ -252,7 +249,7 @@ int main() {
 	progList.pop_back();
 
 	for (int i = 0; i < progList.size(); i++) {
-		compile(progList[i], i + 1, currStage, errorHandler, logger, lexer, parser, semantic);
+		compile(progList[i], i + 1, currStage, logger, lexer, parser, semantic);
 	}
 
 	// print end of program line

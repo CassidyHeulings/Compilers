@@ -1,9 +1,11 @@
 #include "../Headers/Logger.hpp"
 #include <iostream>
 
-Logger::Logger(ErrorHandler& errorHandlerInstance, bool isDebugOn, bool isTestingOn) : errorHandler(errorHandlerInstance) {
+Logger::Logger(bool isDebugOn, bool isTestingOn) {
     debugOn = isDebugOn;
     testingOn = isTestingOn;
+    // create an error handler used by the logger
+    errorHandler = ErrorHandler();
 }
 
 void Logger::debug(const std::string& currProcess, const std::string& statement) {
@@ -38,6 +40,8 @@ void Logger::startProgram(int progNum) {
     std::cout << "\n\033[36m============================================================" << std::endl;
 	std::cout << "======================== \033[35mProgram #" + std::to_string(progNum) + "\033[36m ========================" << std::endl;
 	std::cout << "============================================================\033[0m" << std::endl;
+    // reset the error counters
+	errorHandler.resetCounters();
 }
 
 bool Logger::endProcess(const std::string& currProcess) {
@@ -49,8 +53,8 @@ bool Logger::endProcess(const std::string& currProcess) {
 };
 
 void Logger::endProgram() {
-    int numErrors = errorHandler.getNumErrors();
-    int numWarnings = errorHandler.getNumWarnings();
+    int numErrors = errorHandler.getNumAllErrors();
+    int numWarnings = errorHandler.getNumAllWarnings();
     std::cout << "\n~~~~~~ \033[35mPrograms\033[0m have \033[31m" << numErrors << " errors\033[0m and \033[33m" << numWarnings << " warnings\033[0m ~~~~~~" << std::endl;
 }
 

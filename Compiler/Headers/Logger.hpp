@@ -3,12 +3,8 @@
 #pragma once
 
 class Logger {
-private:
-    ErrorHandler& errorHandler;
-    bool debugOn;
-    bool testingOn;
 public:
-    Logger(ErrorHandler& errorHandlerInstance, bool isDebugOn, bool isTestingOn);
+    Logger(bool isDebugOn, bool isTestingOn);
     // print debug, testing, and info messages from main compiler
     void debug(const std::string& currProcess, const std::string& statement);
     void info(const std::string& currProcess, const std::string& statement);
@@ -27,4 +23,8 @@ public:
     void endProgram();
     // get the value of debug
     bool getDebug();
+private:
+    ErrorHandler errorHandler;
+    bool debugOn;
+    bool testingOn;
 };
