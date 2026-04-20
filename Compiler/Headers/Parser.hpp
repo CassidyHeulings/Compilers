@@ -10,13 +10,13 @@ public:
     // get pointers to the addresses of the necessary vectors
     void setValues(std::vector<std::string>& newTokens, std::vector<std::string>& newVals, std::vector<std::string>& newLocs);
     // check if there is more tokens to parse
-    void checkForNewTree();
+    //void checkForNewTree();
     // to start the parse (create a new tree for each parse)
     void startParse();
     // collect the next piece of input using a pointer
     void nextToken();
-    // return the address of the vector of parse trees
-    std::vector<std::unique_ptr<Tree>>& getTrees();
+    // return the address of the tree
+    std::unique_ptr<Tree>& getTree();
     // print a tree at the given node location using depth first in order traversal
     void printTree(Node& nodeLoc, int treeLevel);
 private:
@@ -24,10 +24,10 @@ private:
     Logger& logger;
     // name of this process for the logger
     std::string name;
-    // store the pointers to each tree
-    std::vector<std::unique_ptr<Tree>> allTrees;
+    // pointer to the tree
+    std::unique_ptr<Tree> tree = nullptr;
     // pointer to current tree
-    Tree* currTree = nullptr;
+    //Tree* tree = nullptr;
     // pointer to tokens produced by lexer
     std::vector<std::string>* tokens;
     // pointer to token values from the code

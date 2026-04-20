@@ -31,8 +31,14 @@ void Logger::warning(const std::string& currProcess, int warningCode, const std:
 }
 
 void Logger::startProcess(const std::string& currProcess) {
-    std::cout << " ============== \033[35m" << currProcess << "\033[0m ==============" << std::endl;
+    std::cout << "\n\033[34m******************** \033[35m" << currProcess << "\033[34m ********************\033[0m" << std::endl;
 };
+
+void Logger::startProgram(int progNum) {
+    std::cout << "\n\033[36m============================================================" << std::endl;
+	std::cout << "======================== \033[35mProgram #" + std::to_string(progNum) + "\033[36m ========================" << std::endl;
+	std::cout << "============================================================\033[0m" << std::endl;
+}
 
 bool Logger::endProcess(const std::string& currProcess) {
     int numErrors = errorHandler.getNumErrors();
@@ -45,8 +51,7 @@ bool Logger::endProcess(const std::string& currProcess) {
 void Logger::endProgram() {
     int numErrors = errorHandler.getNumErrors();
     int numWarnings = errorHandler.getNumWarnings();
-    //std::cout << " ==========  \033[35mProgram is Finished\033[0m  ==========" << std::endl;
-    std::cout << "~~~~~~ \033[35mProgram\033[0m has \033[31m" << numErrors << " errors\033[0m and \033[33m" << numWarnings << " warnings\033[0m ~~~~~~" << std::endl;
+    std::cout << "\n~~~~~~ \033[35mPrograms\033[0m have \033[31m" << numErrors << " errors\033[0m and \033[33m" << numWarnings << " warnings\033[0m ~~~~~~" << std::endl;
 }
 
 bool Logger::getDebug() {

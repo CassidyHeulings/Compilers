@@ -13,16 +13,16 @@ public:
     // print out the ast
     void printTree(Node& nodeLoc, int treeLevel);
     // get all ast trees
-    std::vector<std::unique_ptr<Tree>>& getTrees();
+    std::unique_ptr<Tree>& getTree();
 private:
     // logger instance
     Logger& logger;
     // name of the process for the logger
     std::string name;
     // store the pointers to each tree
-    std::vector<std::unique_ptr<Tree>> allTrees;
+    //std::vector<std::unique_ptr<Tree>> allTrees;
     // pointer to current tree
-    Tree* currTree = nullptr;
+    std::unique_ptr<Tree> tree = nullptr;
     // used to turn chars in a charlist into a full string for ast
     std::string currString = "";
     // add children to the tree
