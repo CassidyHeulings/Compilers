@@ -13,8 +13,6 @@ using namespace std;
 #include "../Headers/Semantic.hpp"
 
 // TODO make printing both trees pretty again
-// TODO do one program at a time
-// TODO log errors and warnings for each process
 // TODO make sure all necessary parts are in AST
 
 void compile(std::string program, int progNum, std::string currStage, ErrorHandler& errorHandler, Logger& logger, Lexer& lexer, Parser& parser, Semantic& semantic) {
@@ -149,9 +147,8 @@ void compile(std::string program, int progNum, std::string currStage, ErrorHandl
 		logger.warning(currStage, 2, "Add code to Input.txt file, ensure it is not commented out with /* */");
 	}
 
-	// decide if end of program
+	// if any errors occured, end the programs process
 	if (logger.endProcess(currStage)) {
-		logger.endProgram();
 		return; 
 	}
 
@@ -166,8 +163,6 @@ void compile(std::string program, int progNum, std::string currStage, ErrorHandl
 	parser.setValues(tokens, tokenVals, tokenLocs);
 	logger.test(currStage, "Starting parse.");
 	parser.startParse();
-	// when parse is done, get the location where all the trees are stored
-	//std::vector<std::unique_ptr<Tree>>& parseTrees = parser.getTrees();
 
 	// when parse is done, get the location where the tree is stored
 	logger.test(currStage, "Getting parse tree.");
@@ -177,37 +172,26 @@ void compile(std::string program, int progNum, std::string currStage, ErrorHandl
 	logger.test(currStage, "Printing parse tree.");
 	parser.printTree(parseTree->retrieveRoot(), -1);
 
-	// if any errors occured, end the program
+	// if any errors occured, end the programs process
 	if (logger.endProcess(currStage)) {
-		logger.endProgram();
 		return; 
 	}
-
+	
 
 	/* ===== SEMANTIC ANALYSIS ===== */
 	currStage = "Semantic Analysis"; // set the new stage
 	logger.startProcess(currStage);
 	logger.info(currStage, "Starting semantic analysis.");
 
-	// turn each cst into a ast
-	//for (std::__1::unique_ptr<Tree>& tree : parseTrees) {
+	// turn the cst into a ast
 	semantic.createAst(parseTree);
-	//}
-
-	// get the vector of abstract syntax trees
-	//std::vector<std::unique_ptr<Tree>>& abstractTrees = semantic.getTrees();
-
 	// get the abstract syntax tree
 	std::unique_ptr<Tree>& abstractTree = semantic.getTree();
-
-	// print each tree
-	//for (std::__1::unique_ptr<Tree>& tree : abstractTrees) {
+	// print the tree
 	semantic.printTree(abstractTree->retrieveRoot(), -1);
-	//}
 
-	// if any errors occured, end the program
+	// if any errors occured, end the programs process
 	if (logger.endProcess(currStage)) {
-		logger.endProgram();
 		return; 
 	}
 

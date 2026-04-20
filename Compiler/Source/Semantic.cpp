@@ -7,10 +7,7 @@ Semantic::Semantic(Logger& loggerInstance, const std::string& processName)
 }
 
 void Semantic::createAst(std::__1::unique_ptr<Tree>& cst) {
-    // add a new ast to the list of trees
-    //allTrees.push_back(std::make_unique<Tree>());
-    // set the current tree pointer to the new tree added to vector
-    //currTree = allTrees.back().get();
+    // create a pointer to the tree
     tree = std::make_unique<Tree>();
     // retrieve the root node of the tree
     Node& root = cst->retrieveRoot();

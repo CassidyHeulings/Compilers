@@ -15,13 +15,10 @@ void Parser::setValues(std::vector<std::string>& newTokens, std::vector<std::str
 }
 
 void Parser::startParse() {
-    // add a new tree to the list of trees
+    // create a pointer to the tree
     tree = std::make_unique<Tree>();
-    //allTrees.push_back(std::make_unique<Tree>());
-    // set the current tree pointer to the new tree added to vector
-    //currTree = allTrees.back().get();
+    // start the parse
     parseProgram();
-    //checkForNewTree();
 }
 
 std::unique_ptr<Tree>& Parser::getTree() {
@@ -66,9 +63,8 @@ void Parser::match(std::string expected) {
     if (!isMatch) {
         logger.error(name, 2, "Expected " + getTokenValues(expected) + " found " + tokenVals->at(tokenIndex) + " at " + tokenLocs->at(tokenIndex));
         // end the program
-        logger.endProcess(name);
-        logger.endProgram();
-        std::exit(0);
+        //logger.endProcess(name);
+        return;
     }
 }
 

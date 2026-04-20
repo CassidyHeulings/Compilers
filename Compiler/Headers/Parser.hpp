@@ -9,8 +9,6 @@ public:
     Parser(Logger& loggerInstance, const std::string& processName);
     // get pointers to the addresses of the necessary vectors
     void setValues(std::vector<std::string>& newTokens, std::vector<std::string>& newVals, std::vector<std::string>& newLocs);
-    // check if there is more tokens to parse
-    //void checkForNewTree();
     // to start the parse (create a new tree for each parse)
     void startParse();
     // collect the next piece of input using a pointer
@@ -26,8 +24,6 @@ private:
     std::string name;
     // pointer to the tree
     std::unique_ptr<Tree> tree = nullptr;
-    // pointer to current tree
-    //Tree* tree = nullptr;
     // pointer to tokens produced by lexer
     std::vector<std::string>* tokens;
     // pointer to token values from the code
