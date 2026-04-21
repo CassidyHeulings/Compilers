@@ -12,6 +12,7 @@ void Parser::setValues(std::vector<std::string>& newTokens, std::vector<std::str
     tokenVals = &newVals;
     tokenLocs = &newLocs;
     tokenIndex = 0;
+    stopPrint = false;
 }
 
 void Parser::startParse() {
@@ -31,8 +32,11 @@ void Parser::printTree(Node& nodeLoc, int treeLevel) {
     for (int i = 0; i < treeLevel; i++) {
         levelString += "--";
     }
+    // don't print anymore
+    if (nodeLoc.getName() == "Error")
+        stopPrint = true;
     // log the node using the node name (ignore the root)
-    if (nodeLoc.getName() != "Root") {
+    if (nodeLoc.getName() != "Root" && stopPrint == false) {
         // printing things from the input code
         if (nodeLoc.getName().size() == 1)
             logger.debug(name, levelString + " " + "[ " + nodeLoc.getName() + " ]");
@@ -62,6 +66,8 @@ void Parser::match(std::string expected) {
     else {
         logger.error(name, 2, "Expected " + getTokenValues(expected) + " found " + tokenVals->at(tokenIndex) + " at " + tokenLocs->at(tokenIndex));
         logger.warning(name, 3, "Fix the error to print the full tree.");
+        // add an error child
+        tree->addChild("Error");
         // end the program parsing
         return;
     }

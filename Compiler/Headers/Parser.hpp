@@ -32,6 +32,8 @@ private:
     std::vector<std::string>* tokenLocs;
     // index of token we are on
     int tokenIndex = 0;
+    // controls printing a tree with an error
+    bool stopPrint = false;
     // match the token name function
     void match(std::string expected);
     // parse functions for each token
