@@ -268,7 +268,6 @@ void Parser::parseChar() {
     tree->moveUpTree();
 }
 
-// TODO keep space child?
 void Parser::parseSpace() {
     tree->addChild("Space");
     match("SPACE");

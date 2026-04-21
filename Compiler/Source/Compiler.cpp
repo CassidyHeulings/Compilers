@@ -11,10 +11,8 @@ using namespace std;
 #include "../Headers/Parser.hpp"
 #include "../Headers/Semantic.hpp"
 
-// TODO make printing both trees pretty again
 // TODO make sure all necessary parts are in AST
-// use warning code 3 if printing cst after an error
-// make input file, test var, and debug var part of the command
+// TODO make input file, test var, and debug var part of the command
 
 void compile(std::string program, int progNum, std::string currStage, Logger& logger, Lexer& lexer, Parser& parser, Semantic& semantic) {
 	// log the program number we are on
@@ -143,7 +141,6 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 
 	// check if there is any tokens at all
 	if (tokens.size() > 0) {
-		// TODO move this to next stage as error
 		// send a warning if there was no EOP symbol
 		if (tokenVals.at(tokenVals.size() - 1) != "$") {
 			logger.warning(currStage, 1, "End each program with EOP symbol $");
