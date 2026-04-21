@@ -10,7 +10,7 @@ void Semantic::createAst(std::__1::unique_ptr<Tree>& cst) {
     // create a pointer to the tree
     tree = std::make_unique<Tree>();
     // make sure string starts empty in between programs
-    currString = "";
+    currString.clear();
     // retrieve the root node of the tree
     Node& root = cst->retrieveRoot();
     // start building the ast
@@ -62,7 +62,7 @@ void Semantic::buildAst(Node& nodeLoc) {
             // move back up the tree -> this node will have no children
             tree->moveUpTree();
             // make string empty for next string
-            currString = "";
+            currString.clear();
         }
     }
     else if (nodeName == "Char" || nodeName == "Space") {

@@ -40,10 +40,10 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 	char nextChar; // next character to look at
 	int lineCount = 1; // track which line we are on
 	int charCount = 1; // track which character number we are on
-	std::string tokenName = ""; // stores the token
-	std::string tokenVal = ""; // stores the value of the token
+	std::string tokenName; // stores the token
+	std::string tokenVal; // stores the value of the token
 	bool isComment = false; // true when we are looking in a comment
-	std::string commentStart = ""; // location of comment start, used for comment close warning and parsing
+	std::string commentStart; // location of comment start, used for comment close warning and parsing
 	std::vector<std::string> tokens; // stores the tokens
 	std::vector<std::string> tokenVals; // stores the token values 
 	std::vector<std::string> tokenLocs; // stores the locations of tokens in input
@@ -132,7 +132,7 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 	}
 
 	// if there was never a comment created, make it the location of the final piece of code
-	if (commentStart == "")
+	if (commentStart.empty())
 		// + 1 for location after final char
 		commentStart = "[" + to_string(lineCount) + ":" + to_string(charCount + 1) + "]";
 
@@ -217,7 +217,7 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 int main() {
 	/* ===== CONSTRUCT CLASS INSTANCES ===== */
 	std::string currStage = "Initialization"; // current part of the compiler we are on for logging
-	Logger logger(true, true); // debugger on, tester on
+	Logger logger(true, false); // debugger on, tester on
 	logger.startProcess(currStage);
 	logger.info(currStage, "Initializing compiler.");
 	// initialize each part of compiler

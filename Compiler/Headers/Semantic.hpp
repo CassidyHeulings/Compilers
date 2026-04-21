@@ -20,7 +20,7 @@ private:
     // pointer to the tree
     std::unique_ptr<Tree> tree = nullptr;
     // used to turn chars in a charlist into a full string for ast
-    std::string currString = "";
+    std::string currString;
     // add children to the tree
     void buildAst(Node& currNode);
 };
