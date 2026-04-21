@@ -88,7 +88,12 @@ void Semantic::printTree(Node& nodeLoc, int treeLevel) {
     }
     // log the node using the node name (ignore the root)
     if (nodeLoc.getName() != "Root") {
-        logger.debug(name, levelString + " " + "\033[36m" + nodeLoc.getName() + "\033[0m");
+        // printing things from the input code
+        if (nodeLoc.getName().size() == 1 || nodeLoc.getName()[0] == '\"')
+            logger.debug(name, levelString + " " + "[ " + nodeLoc.getName() + " ]");
+        // printing token names
+        else
+            logger.debug(name, levelString + " " + "< \033[36m" + nodeLoc.getName() + "\033[0m >");
     }
     // log each child of the current node using recursion
     for (auto& child : nodeLoc.getChildren()) {

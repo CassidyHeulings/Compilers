@@ -1,5 +1,5 @@
 {
-    a = "hello hi
+    a = "hello hi"
 }$
 {
     /* comment */
