@@ -50,22 +50,16 @@ void Parser::printTree(Node& nodeLoc, int treeLevel) {
 // match the token name
 void Parser::match(std::string expected) {
     logger.test(name, "Testing match");
-    bool isMatch = false;
-    int i = 0;
-    while (i < expected.size() && !isMatch) {
-        // if the token we are on is the expected token or token value
-        if (tokens->at(tokenIndex) == expected) {
-            tree->addChild(tokenVals->at(tokenIndex));
-            // move to next token
-            tokenIndex++;
-            // found the match
-            isMatch = true;
-            // move up to parent, match will never have a child
-            tree->moveUpTree();
-        }
-        i++;
+    // if the token we are on is the expected token or token value
+    if (tokens->at(tokenIndex) == expected) {
+        tree->addChild(tokenVals->at(tokenIndex));
+        // move to next token
+        logger.test(name, "next token");
+        tokenIndex++;
+        // move up to parent, match will never have a child
+        tree->moveUpTree();
     }
-    if (!isMatch) {
+    else {
         logger.error(name, 2, "Expected " + getTokenValues(expected) + " found " + tokenVals->at(tokenIndex) + " at " + tokenLocs->at(tokenIndex));
         logger.warning(name, 3, "Fix the error to print the full tree.");
         // end the program parsing

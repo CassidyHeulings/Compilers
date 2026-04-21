@@ -207,7 +207,7 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 int main() {
 	/* ===== CONSTRUCT CLASS INSTANCES ===== */
 	std::string currStage = "Initialization"; // current part of the compiler we are on for logging
-	Logger logger(true, false); // debugger on, tester on
+	Logger logger(true, true); // debugger on, tester on
 	logger.startProcess(currStage);
 	logger.info(currStage, "Initializing compiler.");
 	// initialize each part of compiler
