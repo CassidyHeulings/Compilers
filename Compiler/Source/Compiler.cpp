@@ -43,7 +43,7 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 	std::string tokenName = ""; // stores the token
 	std::string tokenVal = ""; // stores the value of the token
 	bool isComment = false; // true when we are looking in a comment
-	std::string commentStart = ""; // location of comment start, used for comment close warning
+	std::string commentStart = ""; // location of comment start, used for comment close warning and parsing
 	std::vector<std::string> tokens; // stores the tokens
 	std::vector<std::string> tokenVals; // stores the token values 
 	std::vector<std::string> tokenLocs; // stores the locations of tokens in input
@@ -131,6 +131,11 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 		logger.test(currStage, "Character num: " + to_string(currCharNum));
 	}
 
+	// if there was never a comment created, make it the location of the final piece of code
+	if (commentStart == "")
+		// + 1 for location after final char
+		commentStart = "[" + to_string(lineCount) + ":" + to_string(charCount + 1) + "]";
+
 	// send a warning if the comment was never finished
 	if (isComment) {
 		logger.warning(currStage, 0, "Comment started at " + commentStart + " -> Close comment using */");
@@ -144,10 +149,6 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 			logger.warning(currStage, 1, "End each program with EOP symbol $");
 		}
 	}
-	else {
-		// send a warning if empty code
-		logger.warning(currStage, 2, "Add code to Input.txt file, ensure it is not commented out with /* */");
-	}
 
 	// if any errors occured, end the programs process
 	if (logger.endProcess(currStage)) {
@@ -159,6 +160,15 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 	currStage = "Parser"; // change the process to lexer
 	logger.startProcess(currStage);
 	logger.info(currStage, "Starting parser.");
+
+	// mitigate out of range vector checking token vector at token index
+    // will check next tokens, if code provided abrubtly ends, a token is needed that matches nothing
+	// if recursion tries to check a match after the final char, tokens->at(tokenIndex) will fail
+    // without another token to check, we will be increasing the tokenIndex to a size that is greater than the length of the vectors
+    // if we dont increase the token index, recursion will keep checking the same token
+    tokens.push_back("Error");
+    tokenVals.push_back("Nothing");
+    tokenLocs.push_back(commentStart); // location of last start of comment
 
 	// send the lexer values to the parser
 	logger.test(currStage, "Setting values.");
@@ -237,9 +247,13 @@ int main() {
 	while (std::getline(inputFile, line)) {
 		programs += line + "\n"; // keeps track of lines
 	}
+
+	// remove the final "\n"
+	if (!programs.empty())
+		programs.pop_back();
+
 	// close file stream
 	inputFile.close();
-	logger.endProcess(currStage);
 
 	// seperate each program based on eop
 	std::string segment;
@@ -247,10 +261,22 @@ int main() {
 	std::stringstream progStream(programs);
 
 	while(getline(progStream, segment, '$')) {
-		progList.push_back(segment + '$');
+		// dont add the end of program symbol if it was never found
+		if (progStream.eof())
+			progList.push_back(segment);
+		else
+			progList.push_back(segment + '$');
 	}
-	// remove the final segment, it will be empty
-	progList.pop_back();
+	// remove the final segment if at least one $ was found
+	// the final segment will be empty
+	if (progList.size() > 1)
+		progList.pop_back();
+
+	if (progList.empty()) {
+		// send a warning if empty code
+		logger.warning(currStage, 2, "Add code to Input.txt file, ensure it is not commented out with /* */");
+	}
+	logger.endProcess(currStage);
 
 	for (int i = 0; i < progList.size(); i++) {
 		compile(progList[i], i + 1, currStage, logger, lexer, parser, semantic);

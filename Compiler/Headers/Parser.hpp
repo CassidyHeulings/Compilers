@@ -34,6 +34,8 @@ private:
     int tokenIndex = 0;
     // controls printing a tree with an error
     bool stopPrint = false;
+    // controls an error in match
+    bool matchError = false;
     // match the token name function
     void match(std::string expected);
     // parse functions for each token

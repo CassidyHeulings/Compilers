@@ -13,6 +13,7 @@ void Parser::setValues(std::vector<std::string>& newTokens, std::vector<std::str
     tokenLocs = &newLocs;
     tokenIndex = 0;
     stopPrint = false;
+    matchError = false;
 }
 
 void Parser::startParse() {
@@ -54,6 +55,12 @@ void Parser::printTree(Node& nodeLoc, int treeLevel) {
 // match the token name
 void Parser::match(std::string expected) {
     logger.test(name, "Testing match");
+
+    // skip matching if parse error
+    if (matchError) {
+        return;
+    }
+
     // if the token we are on is the expected token or token value
     if (tokens->at(tokenIndex) == expected) {
         tree->addChild(tokenVals->at(tokenIndex));
@@ -63,11 +70,18 @@ void Parser::match(std::string expected) {
         // move up to parent, match will never have a child
         tree->moveUpTree();
     }
+    // error in parse
     else {
         logger.error(name, 2, "Expected " + getTokenValues(expected) + " found " + tokenVals->at(tokenIndex) + " at " + tokenLocs->at(tokenIndex));
-        logger.warning(name, 3, "Fix the error to print the full tree.");
+        // warning for incomplete code
+        if (tokens->at(tokenIndex) == "Error")
+            logger.warning(name, 4, "Check for unclosed comment");
+        // warning for incomplete print of parse tree
+        logger.warning(name, 3, "Fix the error to print the full tree");
         // add an error child
         tree->addChild("Error");
+        // record the match error
+        matchError = true;
         // end the program parsing
         return;
     }
