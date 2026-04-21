@@ -6,16 +6,11 @@ Semantic::Semantic(Logger& loggerInstance, const std::string& processName)
     logger.test(name, "hi im semantic analysis");
 }
 
-/* void Semantic::setValues(std::vector<std::string>& newTokens, std::vector<std::string>& newVals) {
-    tokens = &newTokens;
-    tokenVals = &newVals;
-} */
-
-void Semantic::createAst(std::__1::unique_ptr<ParseTree>& cst) {
-    // add a new ast to the list of trees
-    allTrees.push_back(std::make_unique<AbstractTree>());
-    // set the current tree pointer to the new tree added to vector
-    currTree = allTrees.back().get();
+void Semantic::createAst(std::__1::unique_ptr<Tree>& cst) {
+    // create a pointer to the tree
+    tree = std::make_unique<Tree>();
+    // make sure string starts empty in between programs
+    currString.clear();
     // retrieve the root node of the tree
     Node& root = cst->retrieveRoot();
     // start building the ast
@@ -37,7 +32,7 @@ void Semantic::buildAst(Node& nodeLoc) {
         || nodeName == "IfStatement"
         || nodeName == "WhileStatement") {
         // create a child in ast of the token
-        currTree->addChild(nodeName);
+        tree->addChild(nodeName);
         // we will be moving into these nodes to create children
         // will need to come back up from these nodes to get back to the level above
         // we dont want to move up to the level above until after all the children are taken care of
@@ -50,9 +45,9 @@ void Semantic::buildAst(Node& nodeLoc) {
         || nodeName == "Boolval"
         || nodeName == "Boolop"
         || nodeName == "Intop") {
-        currTree->addChild(nodeLoc.getChildren()[0]->getName()); // each will only have one child
+        tree->addChild(nodeLoc.getChildren()[0]->getName()); // each will only have one child
         // move up the tree immediately
-        currTree->moveUpTree();
+        tree->moveUpTree();
         // we do not set astNode to true - these nodes will have no children
         // we want to move up the tree immediatly since they will never have their own children
     }
@@ -63,11 +58,11 @@ void Semantic::buildAst(Node& nodeLoc) {
         // if it is the end of the string
         if (currString.size() > 1) {
             // add the string as an ast node
-            currTree->addChild(currString);
+            tree->addChild(currString);
             // move back up the tree -> this node will have no children
-            currTree->moveUpTree();
+            tree->moveUpTree();
             // make string empty for next string
-            currString = "";
+            currString.clear();
         }
     }
     else if (nodeName == "Char" || nodeName == "Space") {
@@ -82,15 +77,7 @@ void Semantic::buildAst(Node& nodeLoc) {
     }
 
     // if a parent node was created, move up the tree to the level above
-    if (parentNode) currTree->moveUpTree();
-}
-
-void Semantic::addToString(char letter) {
-    currString += letter;
-}
-
-void Semantic::resetString() {
-    currString = "";
+    if (parentNode) tree->moveUpTree();
 }
 
 void Semantic::printTree(Node& nodeLoc, int treeLevel) {
@@ -101,7 +88,12 @@ void Semantic::printTree(Node& nodeLoc, int treeLevel) {
     }
     // log the node using the node name (ignore the root)
     if (nodeLoc.getName() != "Root") {
-        logger.debug(name, levelString + " " + "\033[36m" + nodeLoc.getName() + "\033[0m");
+        // printing things from the input code
+        if (nodeLoc.getName().size() == 1 || nodeLoc.getName()[0] == '\"')
+            logger.debug(name, levelString + " " + "[ " + nodeLoc.getName() + " ]");
+        // printing token names
+        else
+            logger.debug(name, levelString + " " + "< \033[36m" + nodeLoc.getName() + "\033[0m >");
     }
     // log each child of the current node using recursion
     for (auto& child : nodeLoc.getChildren()) {
@@ -110,6 +102,6 @@ void Semantic::printTree(Node& nodeLoc, int treeLevel) {
     }
 }
 
-std::vector<std::unique_ptr<AbstractTree>>& Semantic::getTrees() {
-    return allTrees;
+std::unique_ptr<Tree>& Semantic::getTree() {
+    return tree;
 }

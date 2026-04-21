@@ -9,25 +9,36 @@ public:
     std::string getErrorMessage(int errorCode);
     // return the warning message based on the code, increase warning count
     std::string getWarningMessage(int warningCode);
-    // get the number of errors in the current process
+    // reset the current program counters
+    void resetCounters();
+    // get the number of errors in current program
     int getNumErrors();
-    // get number of warnings in entire program
+    // get number of warnings in current program
     int getNumWarnings();
+    // get number of errors in all programs
+    int getNumAllErrors();
+    // get number of warnings in all programs
+    int getNumAllWarnings();
 private:
-    // number of errors in the current process
+    // number of errors in the current program
     int errorCounter;
-    // number of warnings in the program
+    // number of warnings in the current program
     int warningCounter;
+    // number of errors in all programs
+    int allErrorCounter;
+    // number of warnings in all programs
+    int allWarningCounter;
     // possible errors
     std::string eflags[3] = {
         "Invalid symbol in grammar", // error code 0
         "Invalid token", // error code 1
         "Invalid grammar" // error code 2
     };
-    std::string wflags[4] = {
+    std::string wflags[5] = {
         "Comment never closed", // warning code 0
         "Program was not ended properly", // warning code 1
         "No code inputted", // warning code 2
-        "Parse tree ends prematurely after first error" // warning code 3
+        "Parse tree ends prematurely after first error", // warning code 3
+        "Incomplete code" // warning code 4
     };
 };

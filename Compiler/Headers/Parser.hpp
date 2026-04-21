@@ -1,6 +1,6 @@
 #include <string>
 #include "Logger.hpp"
-#include "ParseTree.hpp"
+#include "Tree.hpp"
 #pragma once
 
 // class to hold parser information and functions
@@ -9,14 +9,12 @@ public:
     Parser(Logger& loggerInstance, const std::string& processName);
     // get pointers to the addresses of the necessary vectors
     void setValues(std::vector<std::string>& newTokens, std::vector<std::string>& newVals, std::vector<std::string>& newLocs);
-    // check if there is more tokens to parse
-    void checkForNewTree();
     // to start the parse (create a new tree for each parse)
     void startParse();
     // collect the next piece of input using a pointer
     void nextToken();
-    // return the address of the vector of parse trees
-    std::vector<std::unique_ptr<ParseTree>>& getTrees();
+    // return the address of the tree
+    std::unique_ptr<Tree>& getTree();
     // print a tree at the given node location using depth first in order traversal
     void printTree(Node& nodeLoc, int treeLevel);
 private:
@@ -24,10 +22,8 @@ private:
     Logger& logger;
     // name of this process for the logger
     std::string name;
-    // store the pointers to each tree
-    std::vector<std::unique_ptr<ParseTree>> allTrees;
-    // pointer to current tree
-    ParseTree* currTree = nullptr;
+    // pointer to the tree
+    std::unique_ptr<Tree> tree = nullptr;
     // pointer to tokens produced by lexer
     std::vector<std::string>* tokens;
     // pointer to token values from the code
@@ -36,6 +32,10 @@ private:
     std::vector<std::string>* tokenLocs;
     // index of token we are on
     int tokenIndex = 0;
+    // controls printing a tree with an error
+    bool stopPrint = false;
+    // controls an error in match
+    bool matchError = false;
     // match the token name function
     void match(std::string expected);
     // parse functions for each token

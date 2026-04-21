@@ -6,6 +6,8 @@
 class Lexer {
 public:
     Lexer(Logger& loggerInstance, const std::string& processName);
+    // reset vars for new program
+    void newProgram();
     // clear the buffer
     void clearBuffer();
     // reset current and previous state to start

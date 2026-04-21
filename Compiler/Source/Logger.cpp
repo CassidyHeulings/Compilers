@@ -1,9 +1,11 @@
 #include "../Headers/Logger.hpp"
 #include <iostream>
 
-Logger::Logger(ErrorHandler& errorHandlerInstance, bool isDebugOn, bool isTestingOn) : errorHandler(errorHandlerInstance) {
+Logger::Logger(bool isDebugOn, bool isTestingOn) {
     debugOn = isDebugOn;
     testingOn = isTestingOn;
+    // create an error handler used by the logger
+    errorHandler = ErrorHandler();
 }
 
 void Logger::debug(const std::string& currProcess, const std::string& statement) {
@@ -31,21 +33,31 @@ void Logger::warning(const std::string& currProcess, int warningCode, const std:
 }
 
 void Logger::startProcess(const std::string& currProcess) {
-    std::cout << " ============== \033[35m" << currProcess << "\033[0m ==============" << std::endl;
+    std::cout << "\n\033[34m******************** \033[35m" << currProcess << "\033[34m ********************\033[0m" << std::endl;
 };
 
+void Logger::startProgram(int progNum) {
+    std::cout << "\n\033[36m============================================================" << std::endl;
+	std::cout << "======================== \033[35mProgram #" + std::to_string(progNum) + "\033[36m ========================" << std::endl;
+	std::cout << "============================================================\033[0m" << std::endl;
+    // reset the error counters
+	errorHandler.resetCounters();
+}
+
 bool Logger::endProcess(const std::string& currProcess) {
-    info(currProcess, "Finished. ");
-    //std::cout << " ========= " << currProcess << " is Finished =========\n" << std::endl;
     int numErrors = errorHandler.getNumErrors();
+    int numWarnings = errorHandler.getNumWarnings();
+    info(currProcess, "Finished. ");
+    std::cout << "~~~~~~ \033[35m" + currProcess + "\033[0m has \033[31m" << numErrors << " errors\033[0m and \033[33m" << numWarnings << " warnings\033[0m ~~~~~~" << std::endl;
     return (numErrors > 0);
 };
 
 void Logger::endProgram() {
-    int numErrors = errorHandler.getNumErrors();
-    int numWarnings = errorHandler.getNumWarnings();
-    //std::cout << " ==========  \033[35mProgram is Finished\033[0m  ==========" << std::endl;
-    std::cout << "~~~~~~ \033[35m Program \033[0m has \033[31m" << numErrors << " errors\033[0m and \033[33m" << numWarnings << " warnings\033[0m ~~~~~~" << std::endl;
+    int numErrors = errorHandler.getNumAllErrors();
+    int numWarnings = errorHandler.getNumAllWarnings();
+    std::cout << "\n\033[36m===================================================\033[0m" << std::endl;
+    std::cout << "~~~~~~ \033[35mPrograms\033[0m have \033[31m" << numErrors << " errors\033[0m and \033[33m" << numWarnings << " warnings\033[0m ~~~~~~" << std::endl;
+    std::cout << "\033[36m===================================================\033[0m" << std::endl;
 }
 
 bool Logger::getDebug() {

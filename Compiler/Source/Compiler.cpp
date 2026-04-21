@@ -3,63 +3,30 @@
 #include <fstream>
 #include <cctype>
 #include <vector>
+#include <sstream>
 using namespace std;
 // headers
-#include "../Headers/ErrorHandler.hpp"
 #include "../Headers/Logger.hpp"
 #include "../Headers/Lexer.hpp"
 #include "../Headers/Parser.hpp"
 #include "../Headers/Semantic.hpp"
 
-// TODO make printing both trees pretty again
-// TODO check for functions/vars not being used
-// TODO do one program at a time
-// TODO log errors and warnings for each process
 // TODO make sure all necessary parts are in AST
+// TODO make input file, test var, and debug var part of the command
 
-int main() {
-	/* ===== CONSTRUCT CLASS INSTANCES ===== */
-	std::string currStage = "Initialization"; // current part of the compiler we are on for logging
-	ErrorHandler errorHandler;
-	Logger logger(errorHandler, true, false); // errorHandler instance, debugger on, tester on
+void compile(std::string program, int progNum, std::string currStage, Logger& logger, Lexer& lexer, Parser& parser, Semantic& semantic) {
+	// log the program number we are on
+	logger.startProgram(progNum);
+
+	/* === PREPARE COMPILE === */
+	currStage = "Preparing Compile";
 	logger.startProcess(currStage);
-	logger.info(currStage, "Initializing compiler.");
-	// initialize each part of compiler
-	Lexer lexer(logger, "Lexer");
-	logger.debug(currStage, "Lexer is ready.");
-	Parser parser(logger, "Parser");
-	logger.debug(currStage, "Parser is ready.");
-	Semantic semantic(logger, "Semantic Analysis");
-	logger.debug(currStage, "Semantic analyzer is ready.");
-	logger.endProcess(currStage);
-
-
-	/* ===== COLLECT INPUT ===== */
-	currStage = "Reading Input";
-	logger.startProcess(currStage);
-	std::ifstream inputFile("Compiler/Input.txt");
-	std::string line; // singular line in file
-	std::string programs; // string of the input
-
-	// make sure text file is found
-	if (!inputFile.is_open()) {
-		logger.info(currStage, "Error: Input.txt not found.");
-		return 1;
-	}
-	logger.info(currStage, "Start of input reading.");
-	// read the file
-	while (std::getline(inputFile, line)) {
-		programs += line + "\n"; // keeps track of lines
-	}
-
-	logger.debug(currStage, "Creating input information.");
+	logger.debug(currStage, "Compiling \033[35mProgram #" + to_string(progNum) + "\033[0m.");
 	// get the character length of input
-	int progamLength = programs.length();
+	int programLength = program.length();
 	// log input information
-	logger.test(currStage, "Input: " + programs);
-	logger.test(currStage, "input length: " + to_string(progamLength));
-	// close file stream
-	inputFile.close();
+	logger.test(currStage, "Input: " + program);
+	logger.test(currStage, "input length: " + to_string(programLength));
 	logger.endProcess(currStage);
 
 
@@ -71,19 +38,21 @@ int main() {
 	char nextChar; // next character to look at
 	int lineCount = 1; // track which line we are on
 	int charCount = 1; // track which character number we are on
-	std::string tokenName = ""; // stores the token
-	std::string tokenVal = ""; // stores the value of the token
+	std::string tokenName; // stores the token
+	std::string tokenVal; // stores the value of the token
 	bool isComment = false; // true when we are looking in a comment
-	std::string commentStart = ""; // location of comment start, used for comment close warning
+	std::string commentStart; // location of comment start, used for comment close warning and parsing
 	std::vector<std::string> tokens; // stores the tokens
 	std::vector<std::string> tokenVals; // stores the token values 
 	std::vector<std::string> tokenLocs; // stores the locations of tokens in input
 
 	logger.info(currStage, "Starting lexing.");
+	lexer.newProgram();
+
 	// loop through each character in the program
-	while (currCharNum < progamLength) {
-		currChar = programs[currCharNum]; // set the value of the character
-		nextChar = programs[currCharNum + 1]; // set value of the next character
+	while (currCharNum < programLength) {
+		currChar = program[currCharNum]; // set the value of the character
+		nextChar = program[currCharNum + 1]; // set value of the next character
 		charCount++; // increase character count in line
 
 		// ignore white space
@@ -160,6 +129,11 @@ int main() {
 		logger.test(currStage, "Character num: " + to_string(currCharNum));
 	}
 
+	// if there was never a comment created, make it the location of the final piece of code
+	if (commentStart.empty())
+		// + 1 for location after final char
+		commentStart = "[" + to_string(lineCount) + ":" + to_string(charCount + 1) + "]";
+
 	// send a warning if the comment was never finished
 	if (isComment) {
 		logger.warning(currStage, 0, "Comment started at " + commentStart + " -> Close comment using */");
@@ -167,21 +141,15 @@ int main() {
 
 	// check if there is any tokens at all
 	if (tokens.size() > 0) {
-		// TODO move this to next stage as error
 		// send a warning if there was no EOP symbol
 		if (tokenVals.at(tokenVals.size() - 1) != "$") {
 			logger.warning(currStage, 1, "End each program with EOP symbol $");
 		}
 	}
-	else {
-		// send a warning if empty code
-		logger.warning(currStage, 2, "Add code to Input.txt file, ensure it is not commented out with /* */");
-	}
 
-	// decide if end of program
+	// if any errors occured, end the programs process
 	if (logger.endProcess(currStage)) {
-		logger.endProgram();
-		return 1; 
+		return; 
 	}
 
 
@@ -190,25 +158,32 @@ int main() {
 	logger.startProcess(currStage);
 	logger.info(currStage, "Starting parser.");
 
+	// mitigate out of range vector checking token vector at token index
+    // will check next tokens, if code provided abrubtly ends, a token is needed that matches nothing
+	// if recursion tries to check a match after the final char, tokens->at(tokenIndex) will fail
+    // without another token to check, we will be increasing the tokenIndex to a size that is greater than the length of the vectors
+    // if we dont increase the token index, recursion will keep checking the same token
+    tokens.push_back("Error");
+    tokenVals.push_back("Nothing");
+    tokenLocs.push_back(commentStart); // location of last start of comment
+
 	// send the lexer values to the parser
+	logger.test(currStage, "Setting values.");
 	parser.setValues(tokens, tokenVals, tokenLocs);
+	logger.test(currStage, "Starting parse.");
 	parser.startParse();
-	// when parse is done, get the location where all the trees are stored
-	std::vector<std::unique_ptr<ParseTree>>& parseTrees = parser.getTrees();
 
-	// print out the parse trees using a depth first in order traversal
-	int progNum = 1;
-	for (std::__1::unique_ptr<ParseTree>& tree : parseTrees) {
-		logger.debug(currStage, "\033[35mProgram #" + to_string(progNum) + "\033[0m: ");
-		// get the root node of the tree to start at level -1 of the tree (root does not print)
-		parser.printTree(tree->retrieveRoot(), -1);
-		progNum++;
-	}
+	// when parse is done, get the location where the tree is stored
+	logger.test(currStage, "Getting parse tree.");
+	std::unique_ptr<Tree>& parseTree = parser.getTree();
 
-	// if any errors occured, end the program
+	// print out the parse tree using a depth first in order traversal
+	logger.test(currStage, "Printing parse tree.");
+	parser.printTree(parseTree->retrieveRoot(), -1);
+
+	// if any errors occured, end the programs process
 	if (logger.endProcess(currStage)) {
-		logger.endProgram();
-		return 1; 
+		return; 
 	}
 
 
@@ -217,26 +192,16 @@ int main() {
 	logger.startProcess(currStage);
 	logger.info(currStage, "Starting semantic analysis.");
 
-	// turn each cst into a ast
-	for (std::__1::unique_ptr<ParseTree>& tree : parseTrees) {
-		semantic.createAst(tree);
-	}
+	// turn the cst into a ast
+	semantic.createAst(parseTree);
+	// get the abstract syntax tree
+	std::unique_ptr<Tree>& abstractTree = semantic.getTree();
+	// print the tree
+	semantic.printTree(abstractTree->retrieveRoot(), -1);
 
-	// get the vector of abstract syntax trees
-	std::vector<std::unique_ptr<AbstractTree>>& abstractTrees = semantic.getTrees();
-
-	// print each tree
-	progNum = 1;
-	for (std::__1::unique_ptr<AbstractTree>& tree : abstractTrees) {
-		logger.debug(currStage, "\033[35mProgram #" + to_string(progNum) + "\033[0m: ");
-		semantic.printTree(tree->retrieveRoot(), -1);
-		progNum++;
-	}
-
-	// if any errors occured, end the program
+	// if any errors occured, end the programs process
 	if (logger.endProcess(currStage)) {
-		logger.endProgram();
-		return 1; 
+		return; 
 	}
 
 
@@ -244,6 +209,76 @@ int main() {
 
 
 	/* ===== END OF COMPILE ===== */
+}
+
+int main() {
+	/* ===== CONSTRUCT CLASS INSTANCES ===== */
+	std::string currStage = "Initialization"; // current part of the compiler we are on for logging
+	Logger logger(true, false); // debugger on, tester on
+	logger.startProcess(currStage);
+	logger.info(currStage, "Initializing compiler.");
+	// initialize each part of compiler
+	Lexer lexer(logger, "Lexer");
+	logger.debug(currStage, "Lexer is ready.");
+	Parser parser(logger, "Parser");
+	logger.debug(currStage, "Parser is ready.");
+	Semantic semantic(logger, "Semantic Analysis");
+	logger.debug(currStage, "Semantic analyzer is ready.");
+	logger.endProcess(currStage);
+	
+
+	/* ===== COLLECT INPUT ===== */
+	currStage = "Reading Input";
+	logger.startProcess(currStage);
+	std::ifstream inputFile("Compiler/Input.txt");
+	std::string line; // singular line in file
+	std::string programs; // string of the input
+
+	// make sure text file is found
+	if (!inputFile.is_open()) {
+		logger.info(currStage, "Error: Input.txt not found.");
+		return 1;
+	}
+	logger.info(currStage, "Start of input reading.");
+	// read the file
+	while (std::getline(inputFile, line)) {
+		programs += line + "\n"; // keeps track of lines
+	}
+
+	// remove the final "\n"
+	if (!programs.empty())
+		programs.pop_back();
+
+	// close file stream
+	inputFile.close();
+
+	// seperate each program based on eop
+	std::string segment;
+	std::vector<std::string> progList;
+	std::stringstream progStream(programs);
+
+	while(getline(progStream, segment, '$')) {
+		// dont add the end of program symbol if it was never found
+		if (progStream.eof())
+			progList.push_back(segment);
+		else
+			progList.push_back(segment + '$');
+	}
+	// remove the final segment if at least one $ was found
+	// the final segment will be empty
+	if (progList.size() > 1)
+		progList.pop_back();
+
+	if (progList.empty()) {
+		// send a warning if empty code
+		logger.warning(currStage, 2, "Add code to Input.txt file, ensure it is not commented out with /* */");
+	}
+	logger.endProcess(currStage);
+
+	for (int i = 0; i < progList.size(); i++) {
+		compile(progList[i], i + 1, currStage, logger, lexer, parser, semantic);
+	}
+
 	// print end of program line
 	logger.endProgram();
 	return 0;
