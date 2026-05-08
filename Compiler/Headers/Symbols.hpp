@@ -14,9 +14,13 @@ public:
     void setInit(char id);
     // id was used
     void setUsed(char id);
+    // gets the name of each symbol
+    std::vector<char> getSymbols();
+    // getters
+    std::string getType(char id);
+    bool getInit(char id);
+    bool getUsed(char id);
 private:
-    // hash table size
-    int size;
     // data for each symbol in the hash table
     struct Symbol {
         // variable name and the key of the symbol

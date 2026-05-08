@@ -210,7 +210,10 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 	// get the table
 	std::unique_ptr<Tree>& symbolTable = semantic.getTable();
 	// print the table
-	semantic.printTree(symbolTable->retrieveRoot(), -1);
+	logger.test(currStage, "printing table");
+	// get the first child of root, which is the first block in program
+	auto& firstBlock = symbolTable->retrieveRoot().getChildren().front();
+	semantic.printTable(*firstBlock);
 
 	// if any errors occured, end the programs process
 	if (logger.endProcess(currStage)) {

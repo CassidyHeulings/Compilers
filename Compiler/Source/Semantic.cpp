@@ -184,3 +184,22 @@ void Semantic::buildTable(Node& nodeLoc, int treeLevel) {
     // if a parent node was created, move up the tree to the level above
     if (parentNode) table->moveUpTree();
 }
+
+void Semantic::createPrintTable(Node& nodeLoc) {
+    // add block to table
+    for (std::string line : nodeLoc.getBlock())
+        logger.debug(name, line);
+
+    // log each child of the current node using recursion
+    for (auto& child : nodeLoc.getChildren()) {
+        // if the child exists, log next child on next tree level
+        if (child) createPrintTable(*child);
+    }
+}
+
+void Semantic::printTable(Node& nodeLoc) {
+    logger.debug(name, "Symbol Table:");
+    createPrintTable(nodeLoc);
+    // reset the table for printing the next
+    fullTable.empty();
+}

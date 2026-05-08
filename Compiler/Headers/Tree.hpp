@@ -14,7 +14,7 @@ public:
     // add a child to the tree with symbols
     void addSymbolsToNode();
     // get location of symbol array of current node
-    Symbols& getSymbols();
+    //Symbols& getSymbols();
 private:
     // root node of the tree
     Node root;

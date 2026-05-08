@@ -1,9 +1,9 @@
 #include "../Headers/Symbols.hpp"
-#include <iterator>
+#include <vector>
 
 Symbols::Symbols() {
     // initialize each element in array
-    for (int i = 0; i < sizeof(symbols); i++) {
+    for (int i = 0; i < 26; i++) {
         symbols[i] = {'#', "none", false, false};
     }
 }
@@ -51,4 +51,24 @@ void Symbols::setUsed(char id) {
         // warning? error? did not create with type
     }
     symbols[getIndex(id)].isUsed = true;
+}
+
+std::vector<char> Symbols::getSymbols() {
+    std::vector<char> ids;
+    for (int i = 0; i < 26; i++) {
+        if (symbols[i].id != '#') ids.push_back(symbols[i].id);
+    }
+    return ids;
+}
+
+std::string Symbols::getType(char id) {
+    return symbols[getIndex(id)].type;
+}
+
+bool Symbols::getInit(char id) {
+    return symbols[getIndex(id)].isInit;
+}
+
+bool Symbols::getUsed(char id) {
+    return symbols[getIndex(id)].isUsed;
 }

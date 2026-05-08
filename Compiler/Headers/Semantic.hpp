@@ -16,6 +16,8 @@ public:
     void createTable(std::__1::unique_ptr<Tree>& ast);
     // get symbol table
     std::unique_ptr<Tree>& getTable();
+    // print the symbol table
+    void printTable(Node& nodeLoc);
 private:
     // logger instance
     Logger& logger;
@@ -27,8 +29,12 @@ private:
     std::string currString;
     // pointer to the symbol table
     std::unique_ptr<Tree> table = nullptr;
+    // string that is the symbol table
+    std::vector<std::string> fullTable;
     // add children to the tree
     void buildAst(Node& currNode);
     // add children to the symbol table
     void buildTable(Node& nodeLoc, int treeLevel);
+    // make the table ready for printing
+    void createPrintTable(Node& nodeLoc);
 };

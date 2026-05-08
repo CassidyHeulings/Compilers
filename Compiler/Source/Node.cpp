@@ -30,6 +30,47 @@ void Node::addSymbols() {
     symbols = std::make_unique<Symbols>();
 }
 
-Symbols& Node::getSymbols() {
+/* Symbols& Node::getSymbols() {
     return *symbols;
+} */
+
+std::vector<std::string> Node::getBlock() {
+    std::vector<std::string> box;
+    // make a box for the scope node
+    box.push_back(" ____________________________________ ");
+    box.push_back("|");
+    // formatting name to be in center
+    for (int i = 0; i < 17 - name.length()/2; i++) box.at(1) += " ";
+    box.at(1) += name;
+    for (int i = 17 + name.length()/2; i <= 35; i++) box.at(1) += " ";
+    box.at(1) += "|";
+    box.push_back("|  Name    Type    isUsed   isInit   |");
+    // keep track of what number index we are on in vector
+    int index = 3;
+    // get symbols in scope
+    std::vector<char> ids = symbols->getSymbols();
+    for (char id : ids) {
+        box.push_back("| [  ");
+        // id name
+        box.at(index) += id + ",  ";
+        // id type
+        box.at(index) += symbols->getType(id) + ",";
+        // formatting for isUsed
+        for (int j = symbols->getType(id).length(); j <= 10; j++) 
+                box.at(index) += " ";
+        // id isUsed
+        box.at(index) += std::to_string(symbols->getUsed(id)) + ",";
+        // formatting for isInit
+        if (symbols->getUsed(id)) box.at(index) += "    ";
+        else box.at(index) += "   ";
+        // id isInit
+        box.at(index) += std::to_string(symbols->getInit(id));
+        // more formatting
+        if (symbols->getInit(id)) box.at(index) += "  ]  |";
+        else box.at(index) += " ]  |";
+        // increase index of vector
+        index++;
+    }
+    box.push_back("|____________________________________|");
+    return box;
 }
