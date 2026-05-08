@@ -10,11 +10,12 @@ using namespace std;
 #include "../Headers/Lexer.hpp"
 #include "../Headers/Parser.hpp"
 #include "../Headers/Semantic.hpp"
+#include "../Headers/SymbolTable.hpp"
 
 // TODO make sure all necessary parts are in AST
 // TODO make input file, test var, and debug var part of the command
 
-void compile(std::string program, int progNum, std::string currStage, Logger& logger, Lexer& lexer, Parser& parser, Semantic& semantic) {
+void compile(std::string program, int progNum, std::string currStage, Logger& logger, Lexer& lexer, Parser& parser, Semantic& semantic, SymbolTable& symbolTable) {
 	// log the program number we are on
 	logger.startProgram(progNum);
 
@@ -192,7 +193,7 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 	logger.startProcess(currStage);
 	logger.info(currStage, "Starting semantic analysis.");
 
-	// turn the cst into a ast
+	// turn the cst into an ast
 	semantic.createAst(parseTree);
 	// get the abstract syntax tree
 	std::unique_ptr<Tree>& abstractTree = semantic.getTree();
@@ -205,16 +206,31 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 	}
 
 
+	/* ===== Symbol Table ===== */
+	currStage = "Symbol Table"; // set the new stage
+	logger.startProcess(currStage);
+	logger.info(currStage, "Starting symbol table.");
+
+	// use the ast to make the symbol table
+	symbolTable.createTable(abstractTree);
+	// get the table
+	std::unique_ptr<Tree>& table = symbolTable.getTable();
+	// print the table
+	symbolTable.printTable(table->retrieveRoot(), -1);
+
+	// if any errors occured, end the programs process
+	if (logger.endProcess(currStage)) {
+		return; 
+	}
+
 	/* ===== NEXT STAGE ===== */
-
-
 	/* ===== END OF COMPILE ===== */
 }
 
 int main() {
 	/* ===== CONSTRUCT CLASS INSTANCES ===== */
 	std::string currStage = "Initialization"; // current part of the compiler we are on for logging
-	Logger logger(true, false); // debugger on, tester on
+	Logger logger(true, true); // debugger on, tester on
 	logger.startProcess(currStage);
 	logger.info(currStage, "Initializing compiler.");
 	// initialize each part of compiler
@@ -224,6 +240,8 @@ int main() {
 	logger.debug(currStage, "Parser is ready.");
 	Semantic semantic(logger, "Semantic Analysis");
 	logger.debug(currStage, "Semantic analyzer is ready.");
+	SymbolTable symbolTable(logger, "Symbol Table");
+	logger.debug(currStage, "Symbol Table creator is ready");
 	logger.endProcess(currStage);
 	
 
@@ -276,7 +294,7 @@ int main() {
 	logger.endProcess(currStage);
 
 	for (int i = 0; i < progList.size(); i++) {
-		compile(progList[i], i + 1, currStage, logger, lexer, parser, semantic);
+		compile(progList[i], i + 1, currStage, logger, lexer, parser, semantic, symbolTable);
 	}
 
 	// print end of program line

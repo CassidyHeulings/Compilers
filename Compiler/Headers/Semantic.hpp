@@ -10,7 +10,7 @@ public:
     void createAst(std::__1::unique_ptr<Tree>& cst);
     // print out the ast
     void printTree(Node& nodeLoc, int treeLevel);
-    // get all ast trees
+    // get ast tree
     std::unique_ptr<Tree>& getTree();
 private:
     // logger instance
