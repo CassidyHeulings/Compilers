@@ -25,3 +25,12 @@ void Tree::addChild(const std::string& newName) {
 Node& Tree::retrieveRoot() {
     return root;
 }
+
+void Tree::addSymbolsToNode() {
+    // attatch symbol array to node
+    currNode->addSymbols();
+}
+
+Symbols& Tree::getSymbols() {
+    return currNode->getSymbols();
+}

@@ -146,6 +146,7 @@ void Semantic::buildTable(Node& nodeLoc, int treeLevel) {
         logger.test(name, nodeName + " " + std::to_string(treeLevel));
         // create a child in table
         table->addChild(nodeName + std::to_string(treeLevel)); // TODO make 1a not 1 using ascii
+        table->addSymbolsToNode();
         // this node will be a parent
         parentNode = true;
     }
@@ -153,6 +154,7 @@ void Semantic::buildTable(Node& nodeLoc, int treeLevel) {
         logger.test(name, nodeName + " " + std::to_string(treeLevel));
         // create a child in table
         table->addChild(nodeName + std::to_string(treeLevel)); // TODO make 1a not 1 using ascii
+        table->addSymbolsToNode();
         // this node will be a parent
         parentNode = true;
         // mark child var as used
@@ -162,6 +164,7 @@ void Semantic::buildTable(Node& nodeLoc, int treeLevel) {
         logger.test(name, nodeName + " " + std::to_string(treeLevel));
         // create a child in table
         table->addChild(nodeName + std::to_string(treeLevel)); // TODO make 1a not 1 using ascii
+        table->addSymbolsToNode();
         // this node will be a parent
         parentNode = true;
         // mark child var as used
@@ -180,26 +183,4 @@ void Semantic::buildTable(Node& nodeLoc, int treeLevel) {
 
     // if a parent node was created, move up the tree to the level above
     if (parentNode) table->moveUpTree();
-}
-
-void Semantic::printTable(Node& nodeLoc, int treeLevel) {
-    // for logging depth in tree
-    std::string levelString = "|";
-    for (int i = 0; i < treeLevel; i++) {
-        levelString += "--";
-    }
-    // log the node using the node name (ignore the root)
-    if (nodeLoc.getName() != "Root") {
-        // printing things from the input code
-        if (nodeLoc.getName().size() == 1 || nodeLoc.getName()[0] == '\"')
-            logger.debug(name, levelString + " " + "[ " + nodeLoc.getName() + " ]");
-        // printing token names
-        else
-            logger.debug(name, levelString + " " + "< \033[36m" + nodeLoc.getName() + "\033[0m >");
-    }
-    // log each child of the current node using recursion
-    for (auto& child : nodeLoc.getChildren()) {
-        // if the child exists, log next child on next tree level
-        if (child) printTable(*child, treeLevel+1);
-    }
 }

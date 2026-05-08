@@ -11,6 +11,10 @@ public:
     void addChild(const std::string& newName);
     // retrieve location of the root node of the tree
     Node& retrieveRoot();
+    // add a child to the tree with symbols
+    void addSymbolsToNode();
+    // get location of symbol array of current node
+    Symbols& getSymbols();
 private:
     // root node of the tree
     Node root;

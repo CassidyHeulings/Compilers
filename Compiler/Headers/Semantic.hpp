@@ -14,8 +14,6 @@ public:
     std::unique_ptr<Tree>& getTree();
     // create the symbol table based on the ast
     void createTable(std::__1::unique_ptr<Tree>& ast);
-    // print the symbol table
-    void printTable(Node& nodeLoc, int treeLevel);
     // get symbol table
     std::unique_ptr<Tree>& getTable();
 private:

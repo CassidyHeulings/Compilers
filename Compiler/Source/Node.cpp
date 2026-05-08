@@ -25,3 +25,11 @@ Node* Node::getParent() {
 const std::string& Node::getName() {
     return name;
 }
+
+void Node::addSymbols() {
+    symbols = std::make_unique<Symbols>();
+}
+
+Symbols& Node::getSymbols() {
+    return *symbols;
+}

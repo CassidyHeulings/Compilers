@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include "Symbols.hpp"
 #pragma once
 
 class Node {
@@ -16,12 +17,17 @@ public:
     Node* getParent();
     // return the name of the node
     const std::string& getName();
-protected:
+    // attatch symbols to node
+    void addSymbols();
+    // get location of symbol array
+    Symbols& getSymbols();
+private:
     // name of node (will double as key in symbol table)
     std::string name;
     // pointer to the parent node
     Node* parent;
     // vector of the pointers to children of the node
     std::vector<std::unique_ptr<Node>> children;
-    // TODO edit for symbol table usage
+    // pointer to the symbols in the scope
+    std::unique_ptr<Symbols> symbols;
 };

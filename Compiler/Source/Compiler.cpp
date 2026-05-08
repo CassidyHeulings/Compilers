@@ -210,7 +210,7 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 	// get the table
 	std::unique_ptr<Tree>& symbolTable = semantic.getTable();
 	// print the table
-	semantic.printTable(symbolTable->retrieveRoot(), -1);
+	semantic.printTree(symbolTable->retrieveRoot(), -1);
 
 	// if any errors occured, end the programs process
 	if (logger.endProcess(currStage)) {
