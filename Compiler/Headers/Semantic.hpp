@@ -12,6 +12,12 @@ public:
     void printTree(Node& nodeLoc, int treeLevel);
     // get ast tree
     std::unique_ptr<Tree>& getTree();
+    // create the symbol table based on the ast
+    void createTable(std::__1::unique_ptr<Tree>& ast);
+    // print the symbol table
+    void printTable(Node& nodeLoc, int treeLevel);
+    // get symbol table
+    std::unique_ptr<Tree>& getTable();
 private:
     // logger instance
     Logger& logger;
@@ -21,6 +27,10 @@ private:
     std::unique_ptr<Tree> tree = nullptr;
     // used to turn chars in a charlist into a full string for ast
     std::string currString;
+    // pointer to the symbol table
+    std::unique_ptr<Tree> table = nullptr;
     // add children to the tree
     void buildAst(Node& currNode);
+    // add children to the symbol table
+    void buildTable(Node& nodeLoc, int treeLevel);
 };

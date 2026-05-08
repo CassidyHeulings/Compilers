@@ -16,7 +16,7 @@ public:
     Node* getParent();
     // return the name of the node
     const std::string& getName();
-private:
+protected:
     // name of node (will double as key in symbol table)
     std::string name;
     // pointer to the parent node
