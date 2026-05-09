@@ -1,5 +1,6 @@
 #include "../Headers/Symbols.hpp"
 #include <vector>
+#include <iostream>
 
 Symbols::Symbols() {
     // initialize each element in array

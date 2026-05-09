@@ -15,6 +15,8 @@ public:
     void addSymbolsToNode();
     // get location of symbol array of current node
     Symbols& getSymbols();
+    // get the current node
+    Node& getCurr();
 private:
     // root node of the tree
     Node root;

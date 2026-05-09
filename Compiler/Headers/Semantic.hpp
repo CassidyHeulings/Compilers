@@ -43,4 +43,10 @@ private:
     void expandColumns(int row, int column);
     // helper function to tell what type a value is
     std::string decideType(std::string val);
+    // check to see if the symbol table contains the symbol
+    bool hasSymbol(char id, Node& currScope);
+    // return the address of the parent scope that contains the symbol
+    Node& getScope(char id, Node& currScope);
+    // compare type of two ids, returns the type is they match, returns none if they dont
+    std::string compareType(Node& val1Loc, Node& val2Loc);
 };

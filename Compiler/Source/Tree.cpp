@@ -34,3 +34,7 @@ void Tree::addSymbolsToNode() {
 Symbols& Tree::getSymbols() {
     return currNode->getSymbols();
 }
+
+Node& Tree::getCurr() {
+    return *currNode;
+}

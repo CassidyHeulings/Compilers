@@ -119,6 +119,7 @@ void Semantic::createTable(std::__1::unique_ptr<Tree>& ast) {
     buildTable(root, 0, 0);
 }
 
+// TODO add errors and warnings
 void Semantic::buildTable(Node& nodeLoc, int treeLevel, int childNum) {
     // track whether a parent node was created
     bool parentNode = false;
@@ -138,29 +139,66 @@ void Semantic::buildTable(Node& nodeLoc, int treeLevel, int childNum) {
         table->getSymbols().addSymbol(id[0]);
         table->getSymbols().setType(id[0], type);
     }
+
     else if (nodeName == "AssignmentStatement") {
         logger.test(name, nodeName + " " + std::to_string(treeLevel));
-        // first child is variable
-        std::string id = nodeLoc.getChildren()[0]->getName();
-        // second child is assign value
-        std::string val = nodeLoc.getChildren()[1]->getName();
-        // check if var alr exists
-        if (table->getSymbols().contains(id[0])) {
-            // if the type of value and type of id are not the same
-            if (decideType(val) != table->getSymbols().getType(id[0]))
-                return; // error
-        }
-        // if variable does not exist yet
-        else {
-            // warning
+        // first child is an id
+        Node& id = *nodeLoc.getChildren()[0];
+        // next child is the assign value
+        Node& val = *nodeLoc.getChildren()[1];
+
+        std::string typeIs;
+        // if the id doesnt exist yet
+        if (!hasSymbol(id.getName()[0], table->getCurr())) {
+            // warning - no type declaration before init
             // create symbol in table
-            table->getSymbols().addSymbol(id[0]);
+            table->getSymbols().addSymbol(id.getName()[0]);
             // assign type based on input
-            table->getSymbols().setType(id[0], decideType(val));
+            if (decideType(val.getName()) == "id") {
+                if (hasSymbol(val.getName()[0], table->getCurr())) {
+                    // set this id to used
+                    getScope(val.getName()[0], table->getCurr()).getSymbols().setUsed(val.getName()[0]);
+                    // get the type of the id
+                    typeIs = getScope(val.getName()[0], table->getCurr()).getSymbols().getType(val.getName()[0]);
+                    // assign the type to the id
+                    table->getSymbols().setType(id.getName()[0], typeIs);
+                }
+                else return; // error - using symbol that does not exist
+            }
+            else {
+                table->getSymbols().setType(id.getName()[0], decideType(val.getName()));
+            }
         }
-        // said id to initialized
-        table->getSymbols().setInit(id[0]);
+        // if it does exist
+        else {
+            // value is an id
+            if (decideType(val.getName()) == "id") { 
+                // value is in the symbol table
+                if (hasSymbol(val.getName()[0], table->getCurr())) {
+                    // set this id to used
+                    logger.test(name, "setting to used");
+                    getScope(val.getName()[0], table->getCurr()).getSymbols().setUsed(val.getName()[0]);
+                    // see if the two types match
+                    logger.test(name, "do the types match");
+                    typeIs = compareType(id, val);
+                    // if the types do not match, error
+                    if (typeIs == "none") return; // error - not matching types
+                }
+                    else // value is not in symbol table
+                        return; // error - val id does not exists in symbol table
+            }
+            else {
+                logger.test(name, "getting scope");
+                // if types dont match
+                if (getScope(id.getName()[0], table->getCurr()).getSymbols().getType(id.getName()[0]) != decideType(val.getName()))
+                    return; // error - types do not match
+            }
+        logger.test(name, "setting value to init");
+        // set id to initialized
+        table->getSymbols().setInit(id.getName()[0]);
+        }
     }
+
     else if (nodeName == "Block") {
         logger.test(name, nodeName + " " + std::to_string(treeLevel));
         // create a child in table
@@ -171,19 +209,57 @@ void Semantic::buildTable(Node& nodeLoc, int treeLevel, int childNum) {
         // this node will be a parent
         parentNode = true;
     }
-    else if (nodeName == "IfStatement") {
-        logger.test(name, nodeName + " " + std::to_string(treeLevel));
-        // check symbol
 
-    }
-    else if (nodeName == "WhileStatement") {
+    else if (nodeName == "IfStatement" || nodeName == "WhileStatement") {
         logger.test(name, nodeName + " " + std::to_string(treeLevel));
-        // mark child var as used
+        // first child is first val
+        Node& val1 = *nodeLoc.getChildren()[0];
+        // third child is second val
+        Node& val2 = *nodeLoc.getChildren()[2];
+
+        // if both vals are ids
+        if (decideType(val1.getName()) == "id" && decideType(val2.getName()) == "id") {
+            logger.test(name, "both are ids");
+            // check if they are in the symbol table
+            logger.test(name, "checking if they are in symbol table");
+            if (!hasSymbol(val1.getName()[0], table->getCurr()))
+                return; // error - symbol not in symbol table
+            if (!hasSymbol(val2.getName()[0], table->getCurr()))
+                return; // error - symbol not in symbol table
+            // mark second id as used
+            logger.test(name, "second id used");
+            getScope(val2.getName()[0], table->getCurr()).getSymbols().setUsed(val2.getName()[0]);
+            // compare the types
+            logger.test(name, "comparing types");
+            std::string typeIs = compareType(val1, val2);
+            if (typeIs == "none") return; // error - types do not match
+        }
+        // first val is id
+        else if (decideType(val1.getName()) == "id") {
+            // check if in the symbol table
+            if (!hasSymbol(val1.getName()[0], table->getCurr()))
+                return; // error - symbol not in symbol table
+            // mark val as used
+            getScope(val1.getName()[0], table->getCurr()).getSymbols().setUsed(val1.getName()[0]);
+            // compare the types
+            if (getScope(val1.getName()[0], table->getCurr()).getSymbols().getType(val1.getName()[0]) != decideType(val2.getName()))
+                return; // error - mismatch types
+        }
     }
+
     else if (nodeName == "PrintStatement") {
         logger.test(name, nodeName + " " + std::to_string(treeLevel));
-        // mark child var as used
-        // move up the tree immediately
+        // first child is value
+        std::string val = nodeLoc.getChildren()[0]->getName();
+        // check if value is an id
+        if (decideType(val) == "id") {
+            // check if val is in table
+            if (!hasSymbol(val[0], table->getCurr()))
+                return; // error - symbol not in symbol table
+            logger.test(name, "marking print val as used");
+            // if it is, mark as used
+            getScope(val[0], table->getCurr()).getSymbols().setUsed(val[0]);
+        }
     }
 
     // for each child of the node
@@ -257,11 +333,86 @@ void Semantic::expandColumns(int row, int column) {
 }
 
 std::string Semantic::decideType(std::string val) {
+    logger.test(name, "Checking type of " + val);
+    if (val.empty())
+        return "none";
     // string
     if (val[0] == '"')
         return "string";
+    // int
     else if (std::isdigit(val[0]))
         return "int";
+    // boolean
     else if (val == "true" || val == "false")
         return "boolean";
+    // id, not a type
+    else
+        return "id";
+}
+
+bool Semantic::hasSymbol(char id, Node& currScope) {
+    logger.test(name, "Checking scope" + currScope.getName() + " Checking id " + id);
+    // the symbol is in this nodes symbol table
+    if (currScope.getSymbols().contains(id)) return true;
+    // check the parent scope
+    if (currScope.getParent() != nullptr) return hasSymbol(id, *currScope.getParent());
+    // symbol doesnt exist in any parent scopes
+    return false;
+}
+
+// only run if hasSymbol is true to guarenteed address return
+Node& Semantic::getScope(char id, Node& currScope) {
+    logger.test(name, "Checking scope" + currScope.getName());
+    // the symbol is in this nodes symbol table
+    if (currScope.getSymbols().contains(id)) return currScope;
+    // check the parent scope
+    if (currScope.getParent() != nullptr) return getScope(id, *currScope.getParent());
+}
+
+// checks if in symbol tree, does not create new entries in symbol table
+std::string Semantic::compareType(Node& val1Loc, Node& val2Loc) {
+    // the value types
+    std::string val1Type = "none";
+    std::string val2Type = "none";
+
+    // value 1
+    // if node has children, get the type from the children (middle child is some operation)
+    if (val1Loc.getChildren().size() > 0) val1Type = compareType(*val1Loc.getChildren()[0], *val1Loc.getChildren()[2]);
+    // value is an id
+    else if (decideType(val1Loc.getName()) == "id") {
+        logger.test(name, "getting val1 scope");
+        // get the scope of the value
+        Node& val1Scope = getScope(val1Loc.getName()[0], table->getCurr());
+        logger.test(name, "getting val1 type");
+        // get the type
+        val1Type = val1Scope.getSymbols().getType(val1Loc.getName()[0]);
+    }
+    // value is not an id
+    else {
+        // set the type of the value
+        val1Type = decideType(val1Loc.getName());
+    }
+
+    // value 2
+    // if node has children, get the type from the children (middle child is some operation)
+    if (val2Loc.getChildren().size() > 0) val2Type = compareType(*val2Loc.getChildren()[0], *val2Loc.getChildren()[2]);
+    // value is an id
+    else if (decideType(val2Loc.getName()) == "id") {
+        // get the scope of the value
+        Node& val2Scope = getScope(val2Loc.getName()[0], table->getCurr());
+        // mark as used
+        val2Scope.getSymbols().setUsed(val2Loc.getName()[0]);
+        // get the type
+        val2Type = val2Scope.getSymbols().getType(val2Loc.getName()[0]);
+    }
+    // value is not an id
+    else {
+        // set the type of the value
+        val2Type = decideType(val2Loc.getName());
+    }
+
+    // same type
+    if (val1Type == val2Type) return val1Type;
+    // different type
+    else return "none";
 }

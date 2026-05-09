@@ -199,18 +199,12 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 	// print the tree
 	semantic.printTree(abstractTree->retrieveRoot(), -1);
 
-	// TODO keep this here?
-	// if any errors occured, end the programs process
-	if (logger.endProcess(currStage)) {
-		return; 
-	}
-
 	// use the ast to make the symbol table
 	semantic.createTable(abstractTree);
 	// get the table
 	std::unique_ptr<Tree>& symbolTable = semantic.getTable();
 	// print the table
-	logger.test(currStage, "printing table");
+	logger.debug(currStage, "");
 	// get the first child of root, which is the first block in program
 	auto& firstBlock = symbolTable->retrieveRoot().getChildren().front();
 	semantic.printTable(*firstBlock);
@@ -229,7 +223,7 @@ int main() {
 
 	/* ===== CONSTRUCT CLASS INSTANCES ===== */
 	std::string currStage = "Initialization"; // current part of the compiler we are on for logging
-	Logger logger(true, true); // debugger on, tester on
+	Logger logger(true, false); // debugger on, tester on
 	logger.startProcess(currStage);
 	logger.info(currStage, "Initializing compiler.");
 	// initialize each part of compiler
