@@ -52,7 +52,8 @@ std::vector<std::string> Node::getBlock() {
     for (char id : ids) {
         box.push_back("| [  ");
         // id name
-        box.at(index) += id + ",  ";
+        box.at(index) += id;
+        box.at(index) += ",  ";
         // id type
         box.at(index) += symbols->getType(id) + ",";
         // formatting for isUsed

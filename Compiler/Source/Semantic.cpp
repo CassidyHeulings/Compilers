@@ -185,21 +185,59 @@ void Semantic::buildTable(Node& nodeLoc, int treeLevel) {
     if (parentNode) table->moveUpTree();
 }
 
-void Semantic::createPrintTable(Node& nodeLoc) {
-    // add block to table
-    for (std::string line : nodeLoc.getBlock())
-        logger.debug(name, line);
+void Semantic::createPrintTable(Node& nodeLoc, int row, int column) {
+    // write block into table
+    std::vector<std::string> block = nodeLoc.getBlock();
+    for (int r = 0; r < block.size(); r++) {
+        // extend the table to how this row
+        expandRows(row + r);
+        // extend the table row to have enough columns
+        expandColumns(row + r, column + block[r].size());
+        // write each char into the table from the line
+        for (int c = 0; c < block[r].size(); c++) {
+            fullTable[row + r][column + c] = block[r][c];
+        }
+    }
+    // children of this node will be below this node
+    int childRow = row + nodeLoc.getBlock().size() + 1;
+    // children of this node will start before this node in columns
+    int startColumn = column;
+    if (nodeLoc.getChildren().size() > 1) {
+        startColumn = column - 40 / 2;
+    }
 
+    // keeping track of number of children
+    int i = 0;
     // log each child of the current node using recursion
     for (auto& child : nodeLoc.getChildren()) {
         // if the child exists, log next child on next tree level
-        if (child) createPrintTable(*child);
+        if (child) {
+            // make the child column based on what number child it is
+            int childColumn = startColumn + i * 40;
+            createPrintTable(*child, childRow, childColumn);
+            // increase i for next child
+            i++;
+        }
     }
 }
 
 void Semantic::printTable(Node& nodeLoc) {
-    logger.debug(name, "Symbol Table:");
-    createPrintTable(nodeLoc);
-    // reset the table for printing the next
+    // reset the table
     fullTable.empty();
+    // start creating the table with first block at (0, size of block with spacing)
+    createPrintTable(nodeLoc, 0, 20);
+    logger.debug(name, "Symbol Table:");
+    // print the symbol table
+    for (std::string line : fullTable)
+        logger.debug(name, line);
+}
+
+void Semantic::expandRows(int row) {
+    while (fullTable.size() <= row)
+        fullTable.push_back("");
+}
+
+void Semantic::expandColumns(int row, int column) {
+    if (fullTable.at(row).size() < column)
+        fullTable.at(row).resize(column, ' ');
 }

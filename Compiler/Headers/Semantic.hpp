@@ -36,5 +36,9 @@ private:
     // add children to the symbol table
     void buildTable(Node& nodeLoc, int treeLevel);
     // make the table ready for printing
-    void createPrintTable(Node& nodeLoc);
+    void createPrintTable(Node& nodeLoc, int row, int column);
+    // expand the table rows to be the size of the row num
+    void expandRows(int row);
+    // expand the table columns to be the size of the column num
+    void expandColumns(int row, int column);
 };
