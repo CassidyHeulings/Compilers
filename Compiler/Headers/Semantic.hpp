@@ -41,4 +41,6 @@ private:
     void expandRows(int row);
     // expand the table columns to be the size of the column num
     void expandColumns(int row, int column);
+    // helper function to tell what type a value is
+    std::string decideType(std::string val);
 };

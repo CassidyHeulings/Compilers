@@ -20,7 +20,7 @@ public:
     // attatch symbols to node
     void addSymbols();
     // get location of symbol array
-    //Symbols& getSymbols();
+    Symbols& getSymbols();
     // make the block for the node
     std::vector<std::string> getBlock();
 private:

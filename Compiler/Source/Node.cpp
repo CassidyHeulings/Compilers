@@ -30,9 +30,9 @@ void Node::addSymbols() {
     symbols = std::make_unique<Symbols>();
 }
 
-/* Symbols& Node::getSymbols() {
+Symbols& Node::getSymbols() {
     return *symbols;
-} */
+}
 
 std::vector<std::string> Node::getBlock() {
     std::vector<std::string> box;
@@ -57,15 +57,16 @@ std::vector<std::string> Node::getBlock() {
         // id type
         box.at(index) += symbols->getType(id) + ",";
         // formatting for isUsed
-        for (int j = symbols->getType(id).length(); j <= 10; j++) 
+        for (int j = symbols->getType(id).length(); j <= 8; j++) 
                 box.at(index) += " ";
         // id isUsed
-        box.at(index) += std::to_string(symbols->getUsed(id)) + ",";
+        box.at(index) += (symbols->getUsed(id) ? "true" : "false");
+        box.at(index) += ",";
         // formatting for isInit
         if (symbols->getUsed(id)) box.at(index) += "    ";
         else box.at(index) += "   ";
         // id isInit
-        box.at(index) += std::to_string(symbols->getInit(id));
+        box.at(index) += (symbols->getInit(id) ? "true" : "false");
         // more formatting
         if (symbols->getInit(id)) box.at(index) += "  ]  |";
         else box.at(index) += " ]  |";

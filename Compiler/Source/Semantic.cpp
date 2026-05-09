@@ -116,7 +116,7 @@ void Semantic::createTable(std::__1::unique_ptr<Tree>& ast) {
     // retrieve the root node of the tree
     Node& root = ast->retrieveRoot();
     // start building the ast
-    buildTable(root, -1);
+    buildTable(root, 0);
 }
 
 void Semantic::buildTable(Node& nodeLoc, int treeLevel) {
@@ -133,40 +133,51 @@ void Semantic::buildTable(Node& nodeLoc, int treeLevel) {
         // second child is variable
         std::string id = nodeLoc.getChildren()[1]->getName();
         // check if the var alr exists
+        if (table->getSymbols().contains(id[0])) return; // error
         // make an entry in the scopes hashtable using the children
+        table->getSymbols().addSymbol(id[0]);
+        table->getSymbols().setType(id[0], type);
     }
     else if (nodeName == "AssignmentStatement") {
         logger.test(name, nodeName + " " + std::to_string(treeLevel));
         // first child is variable
         std::string id = nodeLoc.getChildren()[0]->getName();
+        // second child is assign value
+        std::string val = nodeLoc.getChildren()[1]->getName();
         // check if var alr exists
-        // make an entry into hash table
+        if (table->getSymbols().contains(id[0])) {
+            // if the type of value and type of id are not the same
+            if (decideType(val) != table->getSymbols().getType(id[0]))
+                return; // error
+        }
+        // if variable does not exist yet
+        else {
+            // warning
+            // create symbol in table
+            table->getSymbols().addSymbol(id[0]);
+            // assign type based on input
+            table->getSymbols().setType(id[0], decideType(val));
+        }
+        // said id to initialized
+        table->getSymbols().setInit(id[0]);
     }
     else if (nodeName == "Block") {
         logger.test(name, nodeName + " " + std::to_string(treeLevel));
         // create a child in table
         table->addChild(nodeName + std::to_string(treeLevel)); // TODO make 1a not 1 using ascii
         table->addSymbolsToNode();
+        // increase tree level
+        treeLevel++;
         // this node will be a parent
         parentNode = true;
     }
     else if (nodeName == "IfStatement") {
         logger.test(name, nodeName + " " + std::to_string(treeLevel));
-        // create a child in table
-        table->addChild(nodeName + std::to_string(treeLevel)); // TODO make 1a not 1 using ascii
-        table->addSymbolsToNode();
-        // this node will be a parent
-        parentNode = true;
-        // mark child var as used
-        // mark as parent
+        // check symbol
+
     }
     else if (nodeName == "WhileStatement") {
         logger.test(name, nodeName + " " + std::to_string(treeLevel));
-        // create a child in table
-        table->addChild(nodeName + std::to_string(treeLevel)); // TODO make 1a not 1 using ascii
-        table->addSymbolsToNode();
-        // this node will be a parent
-        parentNode = true;
         // mark child var as used
     }
     else if (nodeName == "PrintStatement") {
@@ -178,7 +189,7 @@ void Semantic::buildTable(Node& nodeLoc, int treeLevel) {
     // for each child of the node
     for (auto& child : nodeLoc.getChildren()) {
         // recursively keep building the ast
-        if (child) buildTable(*child, treeLevel+1);
+        if (child) buildTable(*child, treeLevel);
     }
 
     // if a parent node was created, move up the tree to the level above
@@ -240,4 +251,14 @@ void Semantic::expandRows(int row) {
 void Semantic::expandColumns(int row, int column) {
     if (fullTable.at(row).size() < column)
         fullTable.at(row).resize(column, ' ');
+}
+
+std::string Semantic::decideType(std::string val) {
+    // string
+    if (val[0] == '"')
+        return "string";
+    else if (std::isdigit(val[0]))
+        return "int";
+    else if (val == "true" || val == "false")
+        return "boolean";
 }
