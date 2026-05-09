@@ -116,10 +116,10 @@ void Semantic::createTable(std::__1::unique_ptr<Tree>& ast) {
     // retrieve the root node of the tree
     Node& root = ast->retrieveRoot();
     // start building the ast
-    buildTable(root, 0);
+    buildTable(root, 0, 0);
 }
 
-void Semantic::buildTable(Node& nodeLoc, int treeLevel) {
+void Semantic::buildTable(Node& nodeLoc, int treeLevel, int childNum) {
     // track whether a parent node was created
     bool parentNode = false;
     // get the token name
@@ -164,7 +164,7 @@ void Semantic::buildTable(Node& nodeLoc, int treeLevel) {
     else if (nodeName == "Block") {
         logger.test(name, nodeName + " " + std::to_string(treeLevel));
         // create a child in table
-        table->addChild(nodeName + std::to_string(treeLevel)); // TODO make 1a not 1 using ascii
+        table->addChild("Scope" + std::to_string(treeLevel) + std::string(1, 'a' + childNum)); // Scope + 0,1,... + a,b,...
         table->addSymbolsToNode();
         // increase tree level
         treeLevel++;
@@ -189,7 +189,10 @@ void Semantic::buildTable(Node& nodeLoc, int treeLevel) {
     // for each child of the node
     for (auto& child : nodeLoc.getChildren()) {
         // recursively keep building the ast
-        if (child) buildTable(*child, treeLevel);
+        if (child) {
+            buildTable(*child, treeLevel, childNum);
+        }
+        if (child->getName() == "Block") childNum++;
     }
 
     // if a parent node was created, move up the tree to the level above
@@ -214,7 +217,7 @@ void Semantic::createPrintTable(Node& nodeLoc, int row, int column) {
     // children of this node will start before this node in columns
     int startColumn = column;
     if (nodeLoc.getChildren().size() > 1) {
-        startColumn = column - 40 / 2;
+        startColumn = column - 36 / 2;
     }
 
     // keeping track of number of children
@@ -224,7 +227,7 @@ void Semantic::createPrintTable(Node& nodeLoc, int row, int column) {
         // if the child exists, log next child on next tree level
         if (child) {
             // make the child column based on what number child it is
-            int childColumn = startColumn + i * 40;
+            int childColumn = startColumn + i * 36;
             createPrintTable(*child, childRow, childColumn);
             // increase i for next child
             i++;

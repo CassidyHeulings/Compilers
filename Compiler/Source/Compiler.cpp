@@ -225,6 +225,8 @@ void compile(std::string program, int progNum, std::string currStage, Logger& lo
 }
 
 int main() {
+	std::ofstream out("Compiler/output.txt");
+
 	/* ===== CONSTRUCT CLASS INSTANCES ===== */
 	std::string currStage = "Initialization"; // current part of the compiler we are on for logging
 	Logger logger(true, true); // debugger on, tester on
